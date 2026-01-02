@@ -1,0 +1,18 @@
+[project]
+name = "talos-sdk-py"
+version = "0.1.5"
+description = "Talos Protocol Python SDK"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "pydantic",
+    "cryptography"
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
