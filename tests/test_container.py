@@ -4,8 +4,7 @@ from abc import ABC, abstractmethod
 
 class IService(ABC):
     @abstractmethod
-    def do(self):
-        ...
+    def do(self): ...
 
 
 class ServiceImpl(IService):
