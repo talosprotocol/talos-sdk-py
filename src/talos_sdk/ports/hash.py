@@ -3,8 +3,7 @@ from typing import Any
 
 
 class IHashPort(ABC):
-    """
-    Port for hashing operations.
+    """Port for hashing operations.
     Includes standard hashing and canonical object hashing.
     """
 
@@ -15,8 +14,7 @@ class IHashPort(ABC):
 
     @abstractmethod
     def canonical_hash(self, obj: Any) -> bytes:
-        """
-        Compute hash of an object using canonical JSON Serialization.
+        """Compute hash of an object using canonical JSON Serialization.
         Essential for content-addressable storage and signatures.
         """
         ...

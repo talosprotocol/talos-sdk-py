@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Protocol, List, Optional
+from typing import Protocol
 
 # Placeholder for models - in a real scenario these would come from talos-contracts
 # But since talos-contracts might not be in the python path of this agent environment,
@@ -19,8 +19,8 @@ class Filters(Protocol):
 
 
 class EventPage(Protocol):
-    events: List[AuditEvent]
-    next_cursor: Optional[str]
+    events: list[AuditEvent]
+    next_cursor: str | None
 
 
 class Stats(Protocol):
@@ -33,8 +33,7 @@ class TimeWindow(Protocol):
 
 
 class IAuditStorePort(ABC):
-    """
-    Port for storing and retrieving audit events.
+    """Port for storing and retrieving audit events.
     Cohesive grouping of audit log storage operations.
     """
 
@@ -45,7 +44,10 @@ class IAuditStorePort(ABC):
 
     @abstractmethod
     def list(
-        self, before: Optional[str] = None, limit: int = 100, filters: Optional[Filters] = None
+        self,
+        before: str | None = None,
+        limit: int = 100,
+        filters: Filters | None = None,
     ) -> EventPage:
         """List events with pagination (cursor-based) and filtering."""
         ...

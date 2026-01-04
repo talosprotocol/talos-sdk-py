@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "talos-sdk-py"
-version = "0.1.19"
+version = "0.1.20"
 description = "Talos Protocol Python SDK"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -39,8 +39,9 @@ talos-sdk = "talos_sdk.conformance.cli:main"
 
 [tool.talos.talos_compatibility]
 protocol_range = "^1.0.0"
-contract_hash = "qiLECQWBPF0mu7krXDT8ZTECTy-FQnLmTczQp9SRb08"
-schedule_hash = "Q_hvsAzI46oi8yZZjtqsbSab1ZFaUnAf6wCvsd5Ey0k"
+contract_hash = "3gi_Ti6G17oMQabjDlVUXcfBqOjN4HswNdD4Lu0uyyI"
+schedule_hash = "TUk4d-djKlVaeLHIF922mq_otmiMOlskHJBA_D23zIA"
+features = ["ratchet"]
 contracts_version = "1.0.0"
 
 [tool.ruff]

@@ -1,13 +1,10 @@
-"""
-Cryptographic primitives for Talos SDK.
+"""Cryptographic primitives for Talos SDK.
 
 Provides wrappers for X25519, Ed25519, and common utilities.
 """
 
 import base64
 from typing import Any
-
-from pydantic import BaseModel, ConfigDict
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
@@ -16,6 +13,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 from cryptography.hazmat.primitives.asymmetric.x25519 import (
     X25519PrivateKey,
 )
+from pydantic import BaseModel, ConfigDict
 
 
 def b64u_encode(data: bytes) -> str:
@@ -32,8 +30,7 @@ def b64u_decode(data: str) -> bytes:
 
 
 class KeyPair(BaseModel):
-    """
-    A generic keypair (Ed25519 or X25519).
+    """A generic keypair (Ed25519 or X25519).
     """
 
     public_key: bytes
@@ -68,14 +65,16 @@ def generate_encryption_keypair() -> KeyPair:
     # Use Raw encoding for X25519
     from cryptography.hazmat.primitives.serialization import (
         Encoding,
-        PublicFormat,
-        PrivateFormat,
         NoEncryption,
+        PrivateFormat,
+        PublicFormat,
     )
 
     pub_bytes = pub.public_bytes(encoding=Encoding.Raw, format=PublicFormat.Raw)
     priv_bytes = priv.private_bytes(
-        encoding=Encoding.Raw, format=PrivateFormat.Raw, encryption_algorithm=NoEncryption()
+        encoding=Encoding.Raw,
+        format=PrivateFormat.Raw,
+        encryption_algorithm=NoEncryption(),
     )
 
     return KeyPair(

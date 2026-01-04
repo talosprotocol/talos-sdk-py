@@ -21,7 +21,9 @@ class JUnitReport:
 
     def add_testcase(self, suite, name, classname, time=0.0):
         case = ET.SubElement(
-            suite, "testcase", {"name": name, "classname": classname, "time": f"{time:.4f}"}
+            suite,
+            "testcase",
+            {"name": name, "classname": classname, "time": f"{time:.4f}"},
         )
         return case
 

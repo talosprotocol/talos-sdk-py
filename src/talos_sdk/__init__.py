@@ -1,5 +1,4 @@
-"""
-Talos SDK - Secure Multi-Language SDK for AI Agents.
+"""Talos SDK - Secure Multi-Language SDK for AI Agents.
 
 This package provides the Python implementation of the Talos Protocol v1,
 enabling secure identity, capability authorization, and MCP request signing.
@@ -16,21 +15,21 @@ Example:
     ... )
 """
 
-from .wallet import Wallet
-from .client import TalosClient, PROTOCOL_VERSION
-from .mcp import sign_mcp_request, verify_mcp_response, SignedFrame
 from .canonical import canonical_json, canonical_json_bytes
+from .client import PROTOCOL_VERSION, TalosClient
 from .errors import (
-    TalosError,
-    TalosDeniedError,
-    TalosInvalidCapabilityError,
-    TalosProtocolMismatchError,
-    TalosFrameInvalidError,
     TalosCryptoError,
+    TalosDeniedError,
+    TalosError,
+    TalosFrameInvalidError,
+    TalosInvalidCapabilityError,
     TalosInvalidInputError,
-    TalosTransportTimeoutError,
+    TalosProtocolMismatchError,
     TalosTransportError,
+    TalosTransportTimeoutError,
 )
+from .mcp import SignedFrame, sign_mcp_request, verify_mcp_response
+from .wallet import Wallet
 
 __version__ = "1.0.0"
 

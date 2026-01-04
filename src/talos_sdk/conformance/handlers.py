@@ -1,11 +1,12 @@
 import base64
 import json
-from talos_sdk.wallet import Wallet
-from talos_sdk.errors import TalosError
-from talos_sdk.session import SessionManager, PrekeyBundle
-from talos_sdk.crypto import KeyPair
+
 from talos_sdk.canonical import canonical_json_bytes
+from talos_sdk.crypto import KeyPair
+from talos_sdk.errors import TalosError
 from talos_sdk.mcp import sign_mcp_request
+from talos_sdk.session import PrekeyBundle, SessionManager
+from talos_sdk.wallet import Wallet
 
 
 def base64url_decode(s):
@@ -90,7 +91,9 @@ class SigningVerifyHandler(BaseHandler):
         if wallet:
             if "did" in expected:
                 if wallet.to_did() != expected["did"]:
-                    raise AssertionError(f"DID mismatch: {wallet.to_did()} != {expected['did']}")
+                    raise AssertionError(
+                        f"DID mismatch: {wallet.to_did()} != {expected['did']}"
+                    )
 
             signature = wallet.sign(message)
             if "signature_base64url" in expected:
@@ -102,7 +105,11 @@ class SigningVerifyHandler(BaseHandler):
 
     def _test_verify(self, inputs, expected):
         message = inputs.get("message_utf8", "").encode("utf-8")
-        public_key = bytes.fromhex(inputs["public_key_hex"]) if "public_key_hex" in inputs else None
+        public_key = (
+            bytes.fromhex(inputs["public_key_hex"])
+            if "public_key_hex" in inputs
+            else None
+        )
         signature = (
             base64url_decode(inputs["signature_base64url"])
             if "signature_base64url" in inputs
@@ -112,7 +119,9 @@ class SigningVerifyHandler(BaseHandler):
         if public_key and signature:
             result = Wallet.verify(message, signature, public_key)
             if expected.get("verify") is not None and expected.get("verify") != result:
-                raise AssertionError(f"Verification mismatch: {result} != {expected.get('verify')}")
+                raise AssertionError(
+                    f"Verification mismatch: {result} != {expected.get('verify')}"
+                )
 
 
 class CanonicalJsonHandler(BaseHandler):
@@ -123,7 +132,9 @@ class CanonicalJsonHandler(BaseHandler):
         if "unordered" in inputs:
             res = canonical_json_bytes(inputs["unordered"]).decode("utf-8")
             if res != expected["canonical"]:
-                raise AssertionError(f"Canonical mismatch: {res} != {expected['canonical']}")
+                raise AssertionError(
+                    f"Canonical mismatch: {res} != {expected['canonical']}"
+                )
         elif "value" in inputs:
             res = canonical_json_bytes(inputs["value"]).decode("utf-8")
             if "canonical_number" in expected:
@@ -140,7 +151,9 @@ class CanonicalJsonHandler(BaseHandler):
             obj = json.loads(inputs["pretty_printed"])
             res = canonical_json_bytes(obj).decode("utf-8")
             if res != expected["canonical"]:
-                raise AssertionError(f"Pretty printed mismatch: {res} != {expected['canonical']}")
+                raise AssertionError(
+                    f"Pretty printed mismatch: {res} != {expected['canonical']}"
+                )
 
 
 class CapabilityHandler(BaseHandler):
@@ -248,14 +261,20 @@ class RatchetHandler(BaseHandler):
                 key_type="ed25519",
             )
 
-        alice_id = mk_pair(trace["alice"]["identity_private"], trace["alice"]["identity_public"])
-        bob_id = mk_pair(trace["bob"]["identity_private"], trace["bob"]["identity_public"])
+        alice_id = mk_pair(
+            trace["alice"]["identity_private"], trace["alice"]["identity_public"]
+        )
+        bob_id = mk_pair(
+            trace["bob"]["identity_private"], trace["bob"]["identity_public"]
+        )
 
         alice_mgr = SessionManager(alice_id)
         bob_mgr = SessionManager(bob_id)
 
         bob_bundle = trace["bob"]["prekey_bundle"]
-        spk_priv = base64url_decode(trace["bob"]["bundle_secrets"]["signed_prekey_private"])
+        spk_priv = base64url_decode(
+            trace["bob"]["bundle_secrets"]["signed_prekey_private"]
+        )
         spk_pub = base64url_decode(bob_bundle["signed_prekey"])
 
         bob_mgr._signed_prekey = KeyPair(
@@ -286,7 +305,9 @@ class RatchetHandler(BaseHandler):
 
         talos_sdk.session.generate_encryption_keypair = mock_gen_init
         try:
-            alice_session = alice_mgr.create_session_as_initiator("did:bob", b_bundle_obj)
+            alice_session = alice_mgr.create_session_as_initiator(
+                "did:bob", b_bundle_obj
+            )
         finally:
             talos_sdk.session.generate_encryption_keypair = original_gen
 
@@ -311,11 +332,18 @@ class RatchetHandler(BaseHandler):
 
                 def mock_gen_step():
                     from cryptography.hazmat.primitives.asymmetric import x25519
-                    from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+                    from cryptography.hazmat.primitives.serialization import (
+                        Encoding,
+                        PublicFormat,
+                    )
 
                     priv_obj = x25519.X25519PrivateKey.from_private_bytes(r_priv)
-                    pub_bytes = priv_obj.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
-                    return KeyPair(private_key=r_priv, public_key=pub_bytes, key_type="x25519")
+                    pub_bytes = priv_obj.public_key().public_bytes(
+                        Encoding.Raw, PublicFormat.Raw
+                    )
+                    return KeyPair(
+                        private_key=r_priv, public_key=pub_bytes, key_type="x25519"
+                    )
 
                 talos_sdk.session.generate_encryption_keypair = mock_gen_step
 
@@ -338,7 +366,9 @@ class RatchetHandler(BaseHandler):
                             h_json = json.loads(h_bytes)
                             peer_dh = base64url_decode(h_json["dh"])
 
-                        bob_session = bob_mgr.create_session_as_responder("did:alice", peer_dh)
+                        bob_session = bob_mgr.create_session_as_responder(
+                            "did:alice", peer_dh
+                        )
 
                     session = alice_session if actor == "alice" else bob_session
                     decrypted = session.decrypt(msg_bytes)
@@ -349,7 +379,9 @@ class RatchetHandler(BaseHandler):
                     )
 
                     if decrypted != expected_pt:
-                        raise AssertionError(f"Decryption mismatch at step {step['step']}")
+                        raise AssertionError(
+                            f"Decryption mismatch at step {step['step']}"
+                        )
 
             finally:
                 talos_sdk.session.generate_encryption_keypair = original_gen
@@ -435,6 +467,10 @@ def get_handler_for_file(filename):
         "v1_1_0_roundtrip.json",
     ]:
         return RatchetHandler()
-    if filename in ["header_canonical_bytes.json", "kdf_rk_step.json", "kdf_ck_step.json"]:
+    if filename in [
+        "header_canonical_bytes.json",
+        "kdf_rk_step.json",
+        "kdf_ck_step.json",
+    ]:
         return MicroVectorHandler()
     return None

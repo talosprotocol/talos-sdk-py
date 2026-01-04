@@ -1,15 +1,13 @@
-"""
-Talos SDK Client.
+"""Talos SDK Client.
 
 High-level TalosClient facade as defined in SDK_CONTRACT.md.
 """
 
-from typing import Any, Optional
+from typing import Any
 
-from .wallet import Wallet
-from .mcp import sign_mcp_request, SignedFrame
 from .errors import TalosTransportError
-
+from .mcp import SignedFrame, sign_mcp_request
+from .wallet import Wallet
 
 # Protocol version supported by this SDK
 PROTOCOL_VERSION = "1.0"
@@ -18,8 +16,7 @@ PROTOCOL_MAX = "1.0"
 
 
 class TalosClient:
-    """
-    High-level Talos client facade.
+    """High-level Talos client facade.
 
     Composes Identity, MCP Security, and Transport modules into
     a simple interface for common operations.
@@ -37,8 +34,7 @@ class TalosClient:
     """
 
     def __init__(self, gateway_url: str, wallet: Wallet):
-        """
-        Initialize a TalosClient.
+        """Initialize a TalosClient.
 
         Args:
             gateway_url: Gateway WebSocket URL
@@ -47,7 +43,7 @@ class TalosClient:
         self._gateway_url = gateway_url
         self._wallet = wallet
         self._connected = False
-        self._session_id: Optional[str] = None
+        self._session_id: str | None = None
         self._correlation_counter = 0
 
     @property
@@ -56,8 +52,7 @@ class TalosClient:
         return self._wallet
 
     def protocol_version(self) -> str:
-        """
-        Get the negotiated protocol version.
+        """Get the negotiated protocol version.
 
         Returns:
             Protocol version string (e.g., "1.0")
@@ -65,8 +60,7 @@ class TalosClient:
         return PROTOCOL_VERSION
 
     def supported_protocol_range(self) -> tuple[str, str]:
-        """
-        Get the SDK's supported protocol range.
+        """Get the SDK's supported protocol range.
 
         Returns:
             Tuple of (min_version, max_version)
@@ -74,8 +68,7 @@ class TalosClient:
         return (PROTOCOL_MIN, PROTOCOL_MAX)
 
     async def connect(self) -> None:
-        """
-        Connect to the gateway.
+        """Connect to the gateway.
 
         Raises:
             TalosTransportError: If connection fails
@@ -102,8 +95,7 @@ class TalosClient:
         tool: str,
         action: str,
     ) -> SignedFrame:
-        """
-        Sign an MCP request.
+        """Sign an MCP request.
 
         Args:
             request: MCP request object
@@ -135,8 +127,7 @@ class TalosClient:
         tool: str,
         action: str,
     ) -> dict[str, Any]:
-        """
-        Sign and send an MCP request, returning the response.
+        """Sign and send an MCP request, returning the response.
 
         Args:
             request: MCP request object

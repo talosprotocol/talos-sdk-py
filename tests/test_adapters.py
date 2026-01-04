@@ -1,13 +1,16 @@
-import sys
 import os
+import sys
 from dataclasses import dataclass
 
 # Ensure src is in path
 sys.path.append(os.path.join(os.path.dirname(__file__), "../src"))
 
-from talos_sdk.adapters.hash import NativeHashAdapter  # noqa: E402
 from talos_sdk.adapters.crypto import Ed25519CryptoAdapter  # noqa: E402
-from talos_sdk.adapters.memory_store import InMemoryKeyValueStore, InMemoryAuditStore  # noqa: E402
+from talos_sdk.adapters.hash import NativeHashAdapter  # noqa: E402
+from talos_sdk.adapters.memory_store import (  # noqa: E402
+    InMemoryAuditStore,
+    InMemoryKeyValueStore,
+)
 
 
 def test_hash_adapter():

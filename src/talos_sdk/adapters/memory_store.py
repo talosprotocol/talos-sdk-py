@@ -1,10 +1,9 @@
-from typing import Dict, List, Optional
 
 from talos_sdk.ports.audit_store import (
-    IAuditStorePort,
     AuditEvent,
-    Filters,
     EventPage,
+    Filters,
+    IAuditStorePort,
     Stats,
     TimeWindow,
 )
@@ -13,9 +12,9 @@ from talos_sdk.ports.key_value_store import IKeyValueStorePort
 
 class InMemoryKeyValueStore(IKeyValueStorePort):
     def __init__(self) -> None:
-        self.store: Dict[str, bytes] = {}
+        self.store: dict[str, bytes] = {}
 
-    def get(self, key: str) -> Optional[bytes]:
+    def get(self, key: str) -> bytes | None:
         return self.store.get(key)
 
     def put(self, key: str, value: bytes) -> None:
@@ -28,13 +27,16 @@ class InMemoryKeyValueStore(IKeyValueStorePort):
 
 class InMemoryAuditStore(IAuditStorePort):
     def __init__(self) -> None:
-        self.events: List[AuditEvent] = []
+        self.events: list[AuditEvent] = []
 
     def append(self, event: AuditEvent) -> None:
         self.events.append(event)
 
     def list(
-        self, before: Optional[str] = None, limit: int = 100, filters: Optional[Filters] = None
+        self,
+        before: str | None = None,
+        limit: int = 100,
+        filters: Filters | None = None,
     ) -> EventPage:
         # Simplistic implementation: return last N events
         # Real implementation would use cursor logic (which should be in domain, not adapter ideally, or adapter uses contract helper)

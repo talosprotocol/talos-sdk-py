@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 
 
 class ICryptoPort(ABC):
-    """
-    Port for cryptographic operations (signing, verification).
+    """Port for cryptographic operations (signing, verification).
     Abstracts the underlying crypto implementation (e.g. Ed25519).
     """
 

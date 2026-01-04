@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-MCP Request Signing Example.
+"""MCP Request Signing Example.
 
 This example demonstrates how to sign MCP requests for secure AI tool invocation.
 """

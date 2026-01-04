@@ -3,7 +3,8 @@ Tests for the Talos SDK TalosClient.
 """
 
 import pytest
-from talos_sdk import Wallet, TalosClient, TalosTransportError
+
+from talos_sdk import TalosClient, TalosTransportError, Wallet
 
 
 class TestTalosClient:

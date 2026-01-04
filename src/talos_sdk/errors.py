@@ -1,5 +1,4 @@
-"""
-Talos SDK Errors.
+"""Talos SDK Errors.
 
 Canonical error taxonomy as defined in SDK_CONTRACT.md.
 """
@@ -16,8 +15,7 @@ class TalosError(Exception):
         request_id: str | None = None,
         cause: Exception | None = None,
     ):
-        """
-        Initialize a TalosError.
+        """Initialize a TalosError.
 
         Args:
             code: Error code from ERROR_TAXONOMY.md (e.g., TALOS_DENIED)

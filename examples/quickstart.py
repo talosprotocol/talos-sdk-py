@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Talos SDK Quickstart Example.
+"""Talos SDK Quickstart Example.
 
 This example demonstrates the basic usage of the Talos SDK:
 1. Generate an identity wallet
@@ -11,7 +10,7 @@ This example demonstrates the basic usage of the Talos SDK:
 
 import asyncio
 
-from talos_sdk import Wallet, TalosClient
+from talos_sdk import TalosClient, Wallet
 
 
 async def main():

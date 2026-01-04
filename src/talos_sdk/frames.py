@@ -1,9 +1,9 @@
-"""
-Framing logic for Talos SDK.
+"""Framing logic for Talos SDK.
 """
 
-import json
 import base64
+import json
+
 from .canonical import canonical_json_bytes
 
 
@@ -17,7 +17,9 @@ def base64url_decode(s: str) -> bytes:
 
 
 class Frame:
-    def __init__(self, frame_type: str, payload: bytes, version: int = 1, flags: int = 0):
+    def __init__(
+        self, frame_type: str, payload: bytes, version: int = 1, flags: int = 0
+    ):
         self.type = frame_type
         self.payload = payload
         self.version = version

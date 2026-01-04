@@ -1,12 +1,13 @@
 import json
 import os
 import time
-from .reports import JUnitReport
+
 from .handlers import get_handler_for_file
+from .reports import JUnitReport
 
 
 def run_conformance(vectors_path, report_path=None):
-    with open(vectors_path, "r") as f:
+    with open(vectors_path) as f:
         data = json.load(f)
 
     # If it is a release set (list of filenames), recurse
@@ -46,7 +47,12 @@ def run_conformance(vectors_path, report_path=None):
             if "expected_error" in data:
                 failures += 1
                 results.append(
-                    (filename, "failure", "Expected error but trace succeeded", time.time() - t0)
+                    (
+                        filename,
+                        "failure",
+                        "Expected error but trace succeeded",
+                        time.time() - t0,
+                    )
                 )
             else:
                 results.append((filename, "passed", None, time.time() - t0))
@@ -60,10 +66,18 @@ def run_conformance(vectors_path, report_path=None):
                 # Ideally verify code/message.
                 expected = data["expected_error"]
                 msg = str(e)
-                if expected.get("message_contains") and expected["message_contains"] not in msg:
+                if (
+                    expected.get("message_contains")
+                    and expected["message_contains"] not in msg
+                ):
                     failures += 1
                     results.append(
-                        (filename, "failure", f"Error mismatch. Got: {msg}", time.time() - t0)
+                        (
+                            filename,
+                            "failure",
+                            f"Error mismatch. Got: {msg}",
+                            time.time() - t0,
+                        )
                     )
                 else:
                     results.append((filename, "passed", None, time.time() - t0))
@@ -102,13 +116,19 @@ def run_conformance(vectors_path, report_path=None):
                 handler.run_negative(data)
             else:
                 handler.run_vector(data)
-            results.append((data.get("test_id", filename), "passed", None, time.time() - t0))
+            results.append(
+                (data.get("test_id", filename), "passed", None, time.time() - t0)
+            )
         except AssertionError as e:
             failures += 1
-            results.append((data.get("test_id", filename), "failure", str(e), time.time() - t0))
+            results.append(
+                (data.get("test_id", filename), "failure", str(e), time.time() - t0)
+            )
         except Exception as e:
             errors += 1
-            results.append((data.get("test_id", filename), "error", str(e), time.time() - t0))
+            results.append(
+                (data.get("test_id", filename), "error", str(e), time.time() - t0)
+            )
 
     # Generate report
     if report_path:
@@ -145,7 +165,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Talos SDK Conformance Runner")
     parser.add_argument(
-        "--vectors", required=True, help="Path to conformance vectors JSON or release set"
+        "--vectors",
+        required=True,
+        help="Path to conformance vectors JSON or release set",
     )
     parser.add_argument("--report", help="Output JUnit XML report path")
 

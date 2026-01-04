@@ -1,8 +1,9 @@
 import json
 import os
-from talos_sdk.session import SessionManager, KeyPair
-from talos_sdk.crypto import b64u_encode, b64u_decode
+
 from talos_sdk.canonical import canonical_json_bytes
+from talos_sdk.crypto import b64u_decode, b64u_encode
+from talos_sdk.session import KeyPair, SessionManager
 
 # Fixed secrets for reproducibility (from old roundtrip_basic.json)
 ALICE_ID_PRIV = b64u_decode("ycPjUCVI9ctfhqau8hlmHSDo_17XS5MV1ZujmHqMWWg")
@@ -56,7 +57,9 @@ def main():
     bob_mgr._prekey_signature = BOB_SPK_SIG
 
     # 2. Setup Alice
-    alice_id = KeyPair(private_key=ALICE_ID_PRIV, public_key=ALICE_ID_PUB, key_type="ed25519")
+    alice_id = KeyPair(
+        private_key=ALICE_ID_PRIV, public_key=ALICE_ID_PUB, key_type="ed25519"
+    )
     alice_mgr = SessionManager(alice_id)
 
     # Trace data
@@ -75,7 +78,9 @@ def main():
         return KeyPair(private_key=ALICE_EPH_PRIV, public_key=pub, key_type="x25519")
 
     session_mod.generate_encryption_keypair = mock_alice_eph
-    alice_session = alice_mgr.create_session_as_initiator("did:bob", bob_mgr.get_prekey_bundle())
+    alice_session = alice_mgr.create_session_as_initiator(
+        "did:bob", bob_mgr.get_prekey_bundle()
+    )
     session_mod.generate_encryption_keypair = orig_gen
 
     plaintext = b"Hello Bob"

@@ -1,5 +1,6 @@
-from talos_sdk.container import Container
 from abc import ABC, abstractmethod
+
+from talos_sdk.container import Container
 
 
 class IService(ABC):

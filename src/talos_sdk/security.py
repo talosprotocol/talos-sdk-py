@@ -1,11 +1,11 @@
-"""
-Capability management for Talos SDK.
+"""Capability management for Talos SDK.
 """
 
-from typing import Any, Optional
-from .wallet import Wallet
-from .canonical import canonical_json_bytes
 import base64
+from typing import Any
+
+from .canonical import canonical_json_bytes
+from .wallet import Wallet
 
 
 def base64url_encode(b: bytes) -> str:
@@ -35,7 +35,7 @@ class Capability:
         subject_did: str,
         scope: Any,
         exp: int,
-        iat: Optional[int] = None,
+        iat: int | None = None,
     ) -> "Capability":
         if iat is None:
             import time

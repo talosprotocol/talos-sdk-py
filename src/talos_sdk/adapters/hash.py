@@ -12,5 +12,7 @@ class NativeHashAdapter(IHashPort):
     def canonical_hash(self, obj: Any) -> bytes:
         # Canonical JSON: keys sorted, no specific whitespace (compact)
         # We use separators=(',', ':') to eliminate whitespace
-        canonical_json = json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        canonical_json = json.dumps(
+            obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        )
         return self.sha256(canonical_json.encode("utf-8"))

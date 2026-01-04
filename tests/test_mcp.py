@@ -34,8 +34,12 @@ class TestMCPSigning:
         wallet = Wallet.from_seed(seed)
         request = {"method": "test"}
 
-        frame1 = sign_mcp_request(wallet, request, "s1", "c1", "tool", "action", timestamp=1000)
-        frame2 = sign_mcp_request(wallet, request, "s1", "c1", "tool", "action", timestamp=1000)
+        frame1 = sign_mcp_request(
+            wallet, request, "s1", "c1", "tool", "action", timestamp=1000
+        )
+        frame2 = sign_mcp_request(
+            wallet, request, "s1", "c1", "tool", "action", timestamp=1000
+        )
 
         assert frame1.signature == frame2.signature
         assert frame1.payload == frame2.payload

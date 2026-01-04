@@ -1,11 +1,9 @@
-"""
-Talos SDK Wallet.
+"""Talos SDK Wallet.
 
 Identity management as defined in SDK_CONTRACT.md.
 """
 
 import hashlib
-from typing import Optional
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
@@ -13,7 +11,6 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 )
 
 from .errors import TalosInvalidInputError
-
 
 # Base58btc alphabet for DID encoding
 _BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
@@ -36,8 +33,7 @@ def _base58_encode(data: bytes) -> str:
 
 
 class Wallet:
-    """
-    Talos identity wallet for key management and signing.
+    """Talos identity wallet for key management and signing.
 
     Implements the Identity module from SDK_CONTRACT.md.
     """
@@ -45,10 +41,9 @@ class Wallet:
     def __init__(
         self,
         private_key: Ed25519PrivateKey,
-        name: Optional[str] = None,
+        name: str | None = None,
     ):
-        """
-        Initialize a Wallet from a private key.
+        """Initialize a Wallet from a private key.
 
         Args:
             private_key: Ed25519 private key
@@ -59,9 +54,8 @@ class Wallet:
         self._name = name
 
     @classmethod
-    def generate(cls, name: Optional[str] = None) -> "Wallet":
-        """
-        Generate a new wallet with a random keypair.
+    def generate(cls, name: str | None = None) -> "Wallet":
+        """Generate a new wallet with a random keypair.
 
         Args:
             name: Optional human-readable name for the wallet
@@ -76,9 +70,8 @@ class Wallet:
         return cls(private_key, name)
 
     @classmethod
-    def from_seed(cls, seed: bytes, name: Optional[str] = None) -> "Wallet":
-        """
-        Create a wallet from a 32-byte seed.
+    def from_seed(cls, seed: bytes, name: str | None = None) -> "Wallet":
+        """Create a wallet from a 32-byte seed.
 
         Args:
             seed: 32-byte seed (raw bytes)
@@ -99,8 +92,7 @@ class Wallet:
         return cls(private_key, name)
 
     def to_did(self) -> str:
-        """
-        Convert the wallet's public key to a DID string.
+        """Convert the wallet's public key to a DID string.
 
         Returns:
             DID string in format did:key:z6Mk...
@@ -116,8 +108,7 @@ class Wallet:
 
     @property
     def address(self) -> str:
-        """
-        Get the hex-encoded public key hash (address).
+        """Get the hex-encoded public key hash (address).
 
         Returns:
             64-character hex string
@@ -131,13 +122,12 @@ class Wallet:
         return self._public_key.public_bytes_raw()
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """Get the wallet name."""
         return self._name
 
     def sign(self, message: bytes) -> bytes:
-        """
-        Sign a message using Ed25519.
+        """Sign a message using Ed25519.
 
         Args:
             message: Arbitrary message bytes
@@ -152,8 +142,7 @@ class Wallet:
 
     @staticmethod
     def verify(message: bytes, signature: bytes, public_key: bytes) -> bool:
-        """
-        Verify a signature against a message and public key.
+        """Verify a signature against a message and public key.
 
         Args:
             message: Original message bytes

@@ -1,5 +1,4 @@
-"""
-Talos SDK Canonical JSON.
+"""Talos SDK Canonical JSON.
 
 Implements the canonicalization rules from CANONICAL_JSON.md.
 """
@@ -9,8 +8,7 @@ from typing import Any
 
 
 def canonical_json(obj: Any) -> str:
-    """
-    Serialize an object to canonical JSON.
+    """Serialize an object to canonical JSON.
 
     Rules:
     - Keys sorted lexicographically
@@ -43,8 +41,7 @@ def canonical_json(obj: Any) -> str:
 
 
 def canonical_json_bytes(obj: Any) -> bytes:
-    """
-    Serialize an object to canonical JSON bytes.
+    """Serialize an object to canonical JSON bytes.
 
     Args:
         obj: Object to serialize

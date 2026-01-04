@@ -1,5 +1,4 @@
-"""
-Talos SDK MCP Security.
+"""Talos SDK MCP Security.
 
 Implements MCP request signing as defined in SDK_CONTRACT.md.
 """
@@ -8,8 +7,8 @@ import time
 from dataclasses import dataclass
 from typing import Any
 
-from .wallet import Wallet
 from .canonical import canonical_json_bytes
+from .wallet import Wallet
 
 
 @dataclass
@@ -31,8 +30,7 @@ def sign_mcp_request(
     action: str,
     timestamp: int | None = None,
 ) -> SignedFrame:
-    """
-    Sign an MCP request with audit bindings.
+    """Sign an MCP request with audit bindings.
 
     Args:
         wallet: Signing identity wallet
@@ -77,8 +75,7 @@ def verify_mcp_response(
     expected_correlation_id: str,
     signer_public_key: bytes,
 ) -> bool:
-    """
-    Verify a signed MCP response.
+    """Verify a signed MCP response.
 
     Args:
         frame: The signed frame to verify

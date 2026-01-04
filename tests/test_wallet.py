@@ -3,7 +3,8 @@ Tests for the Talos SDK Wallet module.
 """
 
 import pytest
-from talos_sdk import Wallet, TalosInvalidInputError
+
+from talos_sdk import TalosInvalidInputError, Wallet
 
 
 class TestWallet:

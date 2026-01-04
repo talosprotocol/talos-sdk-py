@@ -1,11 +1,14 @@
 import argparse
 import sys
+
 from .runner import run_conformance
 
 
 def main():
     parser = argparse.ArgumentParser(description="Talos SDK Conformance Harness")
-    parser.add_argument("--vectors", required=True, help="Path to test vector JSON file")
+    parser.add_argument(
+        "--vectors", required=True, help="Path to test vector JSON file"
+    )
     parser.add_argument("--report", help="Path to write JUnit XML report")
 
     args = parser.parse_args()

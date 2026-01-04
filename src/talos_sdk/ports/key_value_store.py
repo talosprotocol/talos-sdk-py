@@ -1,15 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 
 class IKeyValueStorePort(ABC):
-    """
-    Port for Key-Value storage operations.
+    """Port for Key-Value storage operations.
     Used for projection state, caching, and metadata.
     """
 
     @abstractmethod
-    def get(self, key: str) -> Optional[bytes]:
+    def get(self, key: str) -> bytes | None:
         """Retrieve a value by key. Returns None if not found."""
         ...
 
