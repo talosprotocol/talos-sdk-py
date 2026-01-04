@@ -1,22 +1,23 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
 # =============================================================================
 # talos-sdk-py Test Script
 # =============================================================================
+set -euo pipefail
 
-echo "Testing talos-sdk-py..."
+log() { printf '%s\n' "$*"; }
+info() { printf 'ℹ️  %s\n' "$*"; }
 
-echo "Installing package..."
+info "Testing talos-sdk-py..."
+
+info "Installing package..."
 pip install -e ".[dev]" -q 2>/dev/null || pip install -e . -q
 
-echo "Running ruff check..."
+info "Running ruff check..."
 ruff check src tests 2>/dev/null || ruff check talos_sdk tests 2>/dev/null || true
 
-echo "Running ruff format check..."
+info "Running ruff format check..."
 ruff format --check src tests 2>/dev/null || ruff format --check talos_sdk tests 2>/dev/null || true
 
-echo "Running pytest..."
+info "Running pytest..."
 pytest tests/ --maxfail=1 -q
 
-echo "talos-sdk-py tests passed."
+log "✓ talos-sdk-py tests passed."
