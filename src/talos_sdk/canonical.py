@@ -25,7 +25,7 @@ def canonical_json(obj: Any) -> str:
         Canonical JSON string
     """
 
-    def _preprocess(o):
+    def _preprocess(o: Any) -> Any:
         if isinstance(o, dict):
             return {k: _preprocess(v) for k, v in o.items()}
         if isinstance(o, list):

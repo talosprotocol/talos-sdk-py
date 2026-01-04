@@ -1,4 +1,4 @@
-from typing import Type, TypeVar, Dict, Any, Callable
+from typing import Type, TypeVar, Dict, Any, Callable, cast
 
 T = TypeVar("T")
 
@@ -23,12 +23,12 @@ class Container:
     def resolve(self, interface: Type[T]) -> T:
         """Resolve an implementation for an interface."""
         if interface in self._services:
-            return self._services[interface]
+            return cast(T, self._services[interface])
 
         if interface in self._factories:
             instance = self._factories[interface]()
             # Optionally cache if singleton desired, but keeping simple
-            return instance
+            return cast(T, instance)
 
         raise ValueError(f"No registration found for {interface}")
 

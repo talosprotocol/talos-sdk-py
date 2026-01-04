@@ -64,7 +64,7 @@ class Capability:
         # Verify expiry
         import time
 
-        if self.exp < int(time.time()):
+        if self.exp is None or self.exp < int(time.time()):
             return False
 
         # Get content without signature

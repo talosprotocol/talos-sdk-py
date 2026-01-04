@@ -1,21 +1,81 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "talos-sdk-py"
 version = "0.1.19"
 description = "Talos Protocol Python SDK"
 requires-python = ">=3.10"
 dependencies = [
-    "requests",
-    "pydantic",
-    "cryptography"
+    "requests>=2.31.0",
+    "pydantic>=2.0.0",
+    "cryptography>=41.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "mypy",
+    "build",
+    "types-requests",
+    "types-setuptools"
 ]
 
 [project.scripts]
 talos-sdk = "talos_sdk.conformance.cli:main"
 
 [tool.ruff]
-line-length = 100
+line-length = 88
 target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "D",   # pydocstyle (Google)
+]
+ignore = ["D100", "D104"] # Ignore missing docstring in public module/package
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+# Enforce strictness on Core Modules
+module = [
+    "talos_sdk.canonical",
+    "talos_sdk.wallet",
+    "talos_sdk.mcp",
+    "talos_sdk.session",
+    "talos_sdk.crypto"
+]
+disallow_any_generics = true
+no_implicit_optional = true
+warn_redundant_casts = true
+strict_equality = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+

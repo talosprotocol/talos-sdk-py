@@ -42,7 +42,7 @@ INFO_MESSAGE = b"talos-double-ratchet-message"
 class RatchetError(TalosError):
     """Error during ratchet operation."""
 
-    def __init__(self, message: str, **kwargs):
+    def __init__(self, message: str, **kwargs: Any) -> None:
         super().__init__("TALOS_RATCHET_ERROR", message, **kwargs)
 
 
@@ -61,11 +61,11 @@ class PrekeyBundle(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_serializer("identity_key", "signed_prekey", "prekey_signature")
-    def serialize_bytes(self, v: bytes, _info):
+    def serialize_bytes(self, v: bytes, _info: Any) -> str:
         return base64.b64encode(v).decode()
 
     @field_serializer("one_time_prekey")
-    def serialize_opt_bytes(self, v: Optional[bytes], _info):
+    def serialize_opt_bytes(self, v: Optional[bytes], _info: Any) -> Optional[str]:
         if v is None:
             return None
         return base64.b64encode(v).decode()
@@ -74,12 +74,12 @@ class PrekeyBundle(BaseModel):
         """Verify the prekey signature."""
         return verify_signature(self.signed_prekey, self.prekey_signature, self.identity_key)
 
-    def to_dict(self) -> dict[str, str]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary with base64-encoded keys (compat alias)."""
         return self.model_dump()
 
     @classmethod
-    def from_dict(cls, data: dict[str, str]) -> "PrekeyBundle":
+    def from_dict(cls, data: dict[str, Any]) -> "PrekeyBundle":
         return cls(
             identity_key=base64.b64decode(data["identity_key"]),
             signed_prekey=base64.b64decode(data["signed_prekey"]),
@@ -104,7 +104,7 @@ class MessageHeader(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_serializer("dh_public")
-    def serialize_bytes(self, v: bytes, _info):
+    def serialize_bytes(self, v: bytes, _info: Any) -> str:
         return base64.b64encode(v).decode()
 
     def to_bytes(self) -> bytes:
@@ -156,13 +156,13 @@ class RatchetState(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @field_serializer("dh_remote", "root_key", "chain_key_send", "chain_key_recv")
-    def serialize_opt_bytes(self, v: Optional[bytes], _info):
+    def serialize_opt_bytes(self, v: Optional[bytes], _info: Any) -> Optional[str]:
         if v is None:
             return None
         return base64.b64encode(v).decode()
 
     @field_serializer("skipped_keys")
-    def serialize_skipped(self, v: dict[tuple[bytes, int], bytes], _info):
+    def serialize_skipped(self, v: dict[tuple[bytes, int], bytes], _info: Any) -> list[dict[str, Any]]:
         return [
             {
                 "dh": base64.b64encode(k[0]).decode(),
@@ -264,7 +264,7 @@ class Session:
     Provides forward-secure encryption with per-message keys.
     """
 
-    def __init__(self, peer_id: str, state: RatchetState):
+    def __init__(self, peer_id: str, state: RatchetState) -> None:
         self.peer_id = peer_id
         self.state = state
         self.created_at = time.time()
@@ -281,6 +281,7 @@ class Session:
         if self.state.chain_key_send is None:
             self._initialize_sending_chain()
 
+        assert self.state.chain_key_send is not None
         mk, self.state.chain_key_send = _kdf_ck(self.state.chain_key_send)
 
         header = MessageHeader(
@@ -382,6 +383,7 @@ class Session:
 
         while self.state.recv_count < until:
             mk, self.state.chain_key_recv = _kdf_ck(self.state.chain_key_recv)
+            assert self.state.dh_remote is not None
             key_id = (self.state.dh_remote, self.state.recv_count)
             self.state.skipped_keys[key_id] = mk
             self.state.recv_count += 1
@@ -394,6 +396,7 @@ class Session:
         self.state.dh_remote = header.dh_public
 
         # Derive new receiving chain
+        assert self.state.dh_remote is not None
         dh_recv = _dh(self.state.dh_keypair.private_key, self.state.dh_remote)
         self.state.root_key, self.state.chain_key_recv = _kdf_rk(self.state.root_key, dh_recv)
 
@@ -413,6 +416,8 @@ class Session:
         self.state.dh_keypair = generate_encryption_keypair()
 
         # Derive new sending chain
+        # Derive new sending chain
+        assert self.state.dh_remote is not None
         dh_send = _dh(self.state.dh_keypair.private_key, self.state.dh_remote)
         self.state.root_key, self.state.chain_key_send = _kdf_rk(self.state.root_key, dh_send)
 
@@ -444,7 +449,7 @@ class SessionManager:
     Manages Double Ratchet sessions with multiple peers.
     """
 
-    def __init__(self, identity_keypair: KeyPair, storage_path: Optional[str] = None):
+    def __init__(self, identity_keypair: KeyPair, storage_path: Optional[str] = None) -> None:
         self.identity_keypair = identity_keypair
         self.storage_path = storage_path
         self.sessions: dict[str, Session] = {}
