@@ -34,12 +34,8 @@ class TestMCPSigning:
         wallet = Wallet.from_seed(seed)
         request = {"method": "test"}
 
-        frame1 = sign_mcp_request(
-            wallet, request, "s1", "c1", "tool", "action", timestamp=1000
-        )
-        frame2 = sign_mcp_request(
-            wallet, request, "s1", "c1", "tool", "action", timestamp=1000
-        )
+        frame1 = sign_mcp_request(wallet, request, "s1", "c1", "tool", "action", timestamp=1000)
+        frame2 = sign_mcp_request(wallet, request, "s1", "c1", "tool", "action", timestamp=1000)
 
         assert frame1.signature == frame2.signature
         assert frame1.payload == frame2.payload
@@ -47,9 +43,7 @@ class TestMCPSigning:
     def test_verify_mcp_response_valid(self):
         """verify_mcp_response should pass for valid frame."""
         wallet = Wallet.generate()
-        frame = sign_mcp_request(
-            wallet, {"method": "test"}, "s", "c", "t", "a"
-        )
+        frame = sign_mcp_request(wallet, {"method": "test"}, "s", "c", "t", "a")
 
         is_valid = verify_mcp_response(frame, "c", wallet.public_key)
         assert is_valid is True
@@ -57,9 +51,7 @@ class TestMCPSigning:
     def test_verify_mcp_response_wrong_correlation(self):
         """Wrong correlation ID should fail verification."""
         wallet = Wallet.generate()
-        frame = sign_mcp_request(
-            wallet, {"method": "test"}, "s", "correct", "t", "a"
-        )
+        frame = sign_mcp_request(wallet, {"method": "test"}, "s", "correct", "t", "a")
 
         is_valid = verify_mcp_response(frame, "wrong", wallet.public_key)
         assert is_valid is False
@@ -68,9 +60,7 @@ class TestMCPSigning:
         """Wrong public key should fail verification."""
         wallet1 = Wallet.generate()
         wallet2 = Wallet.generate()
-        frame = sign_mcp_request(
-            wallet1, {"method": "test"}, "s", "c", "t", "a"
-        )
+        frame = sign_mcp_request(wallet1, {"method": "test"}, "s", "c", "t", "a")
 
         is_valid = verify_mcp_response(frame, "c", wallet2.public_key)
         assert is_valid is False

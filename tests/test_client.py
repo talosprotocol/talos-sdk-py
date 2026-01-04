@@ -68,9 +68,7 @@ class TestTalosClient:
         client = TalosClient("wss://example.com", wallet)
 
         await client.connect()
-        response = await client.sign_and_send_mcp(
-            {"method": "test"}, "tool", "action"
-        )
+        response = await client.sign_and_send_mcp({"method": "test"}, "tool", "action")
 
         assert response["status"] == "ok"
         assert "correlation_id" in response

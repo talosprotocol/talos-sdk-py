@@ -34,6 +34,11 @@ from .errors import (
 
 __version__ = "1.0.0"
 
+# SDK Version Exports (required by VERSIONING.md)
+SDK_VERSION = __version__
+SUPPORTED_PROTOCOL_RANGE = ("1.0", "1.x")
+CONTRACT_MANIFEST_HASH = "sha256:pending"  # Updated at build time
+
 __all__ = [
     # Core classes
     "Wallet",
