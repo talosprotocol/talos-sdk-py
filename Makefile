@@ -37,9 +37,21 @@ clean:
 	find . -name "*.pyc" -delete 2>/dev/null || true
 	@echo "Clean complete. Ready for fresh build."
 
-# No services to start for SDK
+# Conformance test
+conformance:
+	@echo "Running conformance tests..."
+	talos-sdk conformance run --vectors ../talos-contracts/test_vectors/sdk/release_sets/v1.0.0.json --report conformance.xml
+
+# Doctor check
+doctor:
+	@echo "Checking environment..."
+	@python3 --version || echo "Python3 missing"
+	@pip --version || echo "Pip missing"
+	@[ -d ".venv" ] && echo "Virtualenv detected" || echo "No virtualenv detected"
+
+# Scripts wrapper
 start:
-	@echo "talos-sdk-py is a library, no services to start."
+	@./scripts/start.sh
 
 stop:
-	@echo "talos-sdk-py is a library, no services to stop."
+	@./scripts/stop.sh
