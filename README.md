@@ -18,7 +18,7 @@ graph TD
     
     ratchet -->|Validate| vectors[Test Vectors]
     
-    subgraph "External"
+    subgraph External[External]
         vectors_repo[talos-contracts]
     end
     
