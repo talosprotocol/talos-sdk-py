@@ -24,8 +24,17 @@ def canonical_json(obj: Any) -> str:
     Returns:
         Canonical JSON string
     """
+    def _preprocess(o):
+        if isinstance(o, dict):
+            return {k: _preprocess(v) for k, v in o.items()}
+        if isinstance(o, list):
+            return [_preprocess(v) for v in o]
+        if isinstance(o, float) and o.is_integer():
+            return int(o)
+        return o
+
     return json.dumps(
-        obj,
+        _preprocess(obj),
         sort_keys=True,
         separators=(",", ":"),
         ensure_ascii=False,
