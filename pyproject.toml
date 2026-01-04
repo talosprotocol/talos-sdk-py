@@ -1,6 +1,6 @@
 [project]
 name = "talos-sdk-py"
-version = "0.1.11"
+version = "0.1.13"
 description = "Talos Protocol Python SDK"
 requires-python = ">=3.10"
 dependencies = [
@@ -8,6 +8,9 @@ dependencies = [
     "pydantic",
     "cryptography"
 ]
+
+[project.scripts]
+talos-sdk = "talos_sdk.conformance.cli:main"
 
 [tool.ruff]
 line-length = 100
