@@ -40,7 +40,7 @@ clean:
 # Conformance test
 conformance:
 	@echo "Running conformance tests..."
-	talos-sdk conformance run --vectors ../talos-contracts/test_vectors/sdk/release_sets/v1.0.0.json --report conformance.xml
+	talos-sdk --vectors ../talos-contracts/test_vectors/sdk/release_sets/$(RELEASE_SET) --report conformance.xml
 
 # Doctor check
 doctor:

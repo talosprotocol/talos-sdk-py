@@ -1,6 +1,6 @@
 [project]
 name = "talos-sdk-py"
-version = "0.1.18"
+version = "0.1.19"
 description = "Talos Protocol Python SDK"
 requires-python = ">=3.10"
 dependencies = [

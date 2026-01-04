@@ -38,7 +38,8 @@ This SDK is a consumer of `talos-contracts` and a peer to the TS/Java/Go SDKs.
 - **Output**: Encrypted, signed Talos Envelopes.
 
 ## Evaluation
-**Status**: Production Ready (v1.1.0).
+**Status**: Failing v1.1.0 conformance vectors (Verify Capability mismatch).
+See `deploy/reports/logs/talos-sdk-py_*.log` for details.
 - **Conformance**: 100% pass rate on `v1.1.0` release set.
 - **Interop**: Verified against TypeScript and Java SDKs.
 
