@@ -6,11 +6,22 @@ build-backend = "setuptools.build_meta"
 name = "talos-sdk-py"
 version = "0.1.19"
 description = "Talos Protocol Python SDK"
+readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Talos Team", email = "sdk@talosprotocol.com" }
+]
+keywords = ["blockchain", "security", "mcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+]
 dependencies = [
-    "requests>=2.31.0",
     "pydantic>=2.0.0",
-    "cryptography>=41.0.0"
+    "cryptography>=41.0.0",
 ]
 
 [project.optional-dependencies]
@@ -25,6 +36,12 @@ dev = [
 
 [project.scripts]
 talos-sdk = "talos_sdk.conformance.cli:main"
+
+[tool.talos.talos_compatibility]
+protocol_range = "^1.0.0"
+contract_hash = "qiLECQWBPF0mu7krXDT8ZTECTy-FQnLmTczQp9SRb08"
+schedule_hash = "Q_hvsAzI46oi8yZZjtqsbSab1ZFaUnAf6wCvsd5Ey0k"
+contracts_version = "1.0.0"
 
 [tool.ruff]
 line-length = 88
