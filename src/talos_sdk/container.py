@@ -5,8 +5,7 @@ T = TypeVar("T")
 
 
 class Container:
-    """A simple thread-safe Dependency Injection container.
-    """
+    """A simple thread-safe Dependency Injection container."""
 
     def __init__(self) -> None:
         self._services: dict[type[Any], Any] = {}

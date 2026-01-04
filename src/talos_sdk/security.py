@@ -1,5 +1,4 @@
-"""Capability management for Talos SDK.
-"""
+"""Capability management for Talos SDK."""
 
 import base64
 from typing import Any
@@ -57,14 +56,17 @@ class Capability:
 
         return cls(cap_data)
 
-    def verify(self, issuer_public_key: bytes) -> bool:
+    def verify(self, issuer_public_key: bytes, now: int | None = None) -> bool:
         if not self.sig:
             return False
 
         # Verify expiry
-        import time
+        if now is None:
+            import time
 
-        if self.exp is None or self.exp < int(time.time()):
+            now = int(time.time())
+
+        if self.exp is None or self.exp < now:
             return False
 
         # Get content without signature
@@ -80,7 +82,6 @@ class Capability:
             return False
 
         for s in self.scope:
-            if s.get("tool") == tool:
-                if action in s.get("actions", []):
-                    return True
+            if s.get("tool") == tool and action in s.get("actions", []):
+                return True
         return False

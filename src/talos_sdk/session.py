@@ -161,6 +161,10 @@ class RatchetState(BaseModel):
             return None
         return base64.b64encode(v).decode()
 
+    @field_serializer("dh_keypair")
+    def serialize_keypair(self, v: KeyPair, _info: Any) -> dict[str, Any]:
+        return v.to_dict()
+
     @field_serializer("skipped_keys")
     def serialize_skipped(
         self, v: dict[tuple[bytes, int], bytes], _info: Any
@@ -312,8 +316,7 @@ class Session:
         return canonical_json_bytes(envelope)
 
     def decrypt(self, message: bytes) -> bytes:
-        """Decrypt a message, performing DH ratchet if needed.
-        """
+        """Decrypt a message, performing DH ratchet if needed."""
         # Parse envelope
         try:
             envelope = json.loads(message)
@@ -323,7 +326,7 @@ class Session:
             header = MessageHeader.from_bytes(header_bytes)
             nonce = b64u_decode(envelope["nonce"])
             ciphertext = b64u_decode(envelope["ciphertext"])
-        except (KeyError, json.JSONDecodeError, ValueError) as e:
+        except (KeyError, ValueError) as e:
             raise RatchetError(f"Malformed message envelope: {e}")
 
         # Try skipped keys first
@@ -450,8 +453,7 @@ class Session:
 
 
 class SessionManager:
-    """Manages Double Ratchet sessions with multiple peers.
-    """
+    """Manages Double Ratchet sessions with multiple peers."""
 
     def __init__(
         self, identity_keypair: KeyPair, storage_path: str | None = None
@@ -479,8 +481,7 @@ class SessionManager:
         peer_id: str,
         peer_bundle: PrekeyBundle,
     ) -> Session:
-        """Create a new session as the initiator (Alice).
-        """
+        """Create a new session as the initiator (Alice)."""
         # Verify peer's prekey signature
         if not peer_bundle.verify():
             raise RatchetError("Invalid prekey signature")
@@ -514,8 +515,7 @@ class SessionManager:
         peer_id: str,
         peer_dh_public: bytes,
     ) -> Session:
-        """Create a new session as the responder (Bob).
-        """
+        """Create a new session as the responder (Bob)."""
         dh_x3dh = _dh(self._signed_prekey.private_key, peer_dh_public)
         root_key = _hkdf_derive(dh_x3dh, b"x3dh-init")
 

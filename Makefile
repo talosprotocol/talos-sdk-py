@@ -22,6 +22,18 @@ test:
 	# Unit tests (Must include happy paths)
 	pytest tests
 
+coverage:
+	# Run coverage report
+	@if ! pip show pytest-cov > /dev/null; then \
+		echo "Installing pytest-cov..."; \
+		pip install pytest-cov; \
+	fi
+	pytest --cov=src --cov-report=term-missing tests
+
+coverage-check:
+	# Enforce threshold (Fail if < 80%)
+	pytest --cov=src --cov-fail-under=80 tests
+
 conformance:
 	# Run conformance vectors
 	# Usage: make conformance RELEASE_SET=v1.1.0.json

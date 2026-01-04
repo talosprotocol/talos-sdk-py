@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "talos-sdk-py"
-version = "0.1.20"
+version = "0.1.21"
 description = "Talos Protocol Python SDK"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -78,7 +78,15 @@ docstring-code-format = true
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
-disallow_untyped_defs = false
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
 
 [[tool.mypy.overrides]]
 # Enforce strictness on Core Modules
@@ -90,10 +98,7 @@ module = [
     "talos_sdk.crypto"
 ]
 disallow_any_generics = true
-no_implicit_optional = true
-warn_redundant_casts = true
 strict_equality = true
-disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]
 module = "tests.*"
@@ -103,4 +108,7 @@ disallow_untyped_defs = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
+
+[tool.coverage.run]
+omit = ["src/talos_sdk/conformance/*"]
 

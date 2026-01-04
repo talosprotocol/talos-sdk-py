@@ -3,6 +3,8 @@
 Canonical error taxonomy as defined in SDK_CONTRACT.md.
 """
 
+from typing import Any
+
 
 class TalosError(Exception):
     """Base class for all Talos SDK errors."""
@@ -46,14 +48,16 @@ class TalosError(Exception):
 class TalosDeniedError(TalosError):
     """Authorization denied."""
 
-    def __init__(self, message: str = "Authorization denied", **kwargs):
+    def __init__(self, message: str = "Authorization denied", **kwargs: Any) -> None:
         super().__init__("TALOS_DENIED", message, **kwargs)
 
 
 class TalosInvalidCapabilityError(TalosError):
     """Capability token invalid."""
 
-    def __init__(self, message: str = "Invalid capability token", **kwargs):
+    def __init__(
+        self, message: str = "Invalid capability token", **kwargs: Any
+    ) -> None:
         super().__init__("TALOS_INVALID_CAPABILITY", message, **kwargs)
 
 
@@ -61,14 +65,16 @@ class TalosInvalidCapabilityError(TalosError):
 class TalosProtocolMismatchError(TalosError):
     """Protocol version incompatible."""
 
-    def __init__(self, message: str = "Protocol version mismatch", **kwargs):
+    def __init__(
+        self, message: str = "Protocol version mismatch", **kwargs: Any
+    ) -> None:
         super().__init__("TALOS_PROTOCOL_MISMATCH", message, **kwargs)
 
 
 class TalosFrameInvalidError(TalosError):
     """Wire frame decode failure."""
 
-    def __init__(self, message: str = "Invalid frame", **kwargs):
+    def __init__(self, message: str = "Invalid frame", **kwargs: Any) -> None:
         super().__init__("TALOS_FRAME_INVALID", message, **kwargs)
 
 
@@ -76,14 +82,16 @@ class TalosFrameInvalidError(TalosError):
 class TalosCryptoError(TalosError):
     """Cryptographic operation failed."""
 
-    def __init__(self, message: str = "Cryptographic operation failed", **kwargs):
+    def __init__(
+        self, message: str = "Cryptographic operation failed", **kwargs: Any
+    ) -> None:
         super().__init__("TALOS_CRYPTO_ERROR", message, **kwargs)
 
 
 class TalosInvalidInputError(TalosError):
     """Invalid input parameters."""
 
-    def __init__(self, message: str = "Invalid input", **kwargs):
+    def __init__(self, message: str = "Invalid input", **kwargs: Any) -> None:
         super().__init__("TALOS_INVALID_INPUT", message, **kwargs)
 
 
@@ -91,12 +99,12 @@ class TalosInvalidInputError(TalosError):
 class TalosTransportTimeoutError(TalosError):
     """Transport operation timed out."""
 
-    def __init__(self, message: str = "Transport timeout", **kwargs):
+    def __init__(self, message: str = "Transport timeout", **kwargs: Any) -> None:
         super().__init__("TALOS_TRANSPORT_TIMEOUT", message, **kwargs)
 
 
 class TalosTransportError(TalosError):
     """Transport-level failure."""
 
-    def __init__(self, message: str = "Transport error", **kwargs):
+    def __init__(self, message: str = "Transport error", **kwargs: Any) -> None:
         super().__init__("TALOS_TRANSPORT_ERROR", message, **kwargs)

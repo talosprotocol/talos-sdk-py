@@ -1,5 +1,4 @@
-"""Framing logic for Talos SDK.
-"""
+"""Framing logic for Talos SDK."""
 
 import base64
 import json

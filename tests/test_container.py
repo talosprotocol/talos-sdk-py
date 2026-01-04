@@ -1,41 +1,40 @@
 from abc import ABC, abstractmethod
 
+import pytest
+
 from talos_sdk.container import Container
 
 
 class IService(ABC):
     @abstractmethod
-    def do(self): ...
+    def do(self) -> str: ...
 
 
 class ServiceImpl(IService):
-    def do(self):
+    def do(self) -> str:
         return "done"
 
 
-def test_container_singleton():
+def test_container_singleton() -> None:
     c = Container()
     impl = ServiceImpl()
-    c.register(IService, impl)
+    c.register(IService, impl)  # type: ignore[type-abstract]
 
-    assert c.resolve(IService) is impl
-    assert c.resolve(IService).do() == "done"
+    assert c.resolve(IService) is impl  # type: ignore[type-abstract]
+    assert c.resolve(IService).do() == "done"  # type: ignore[type-abstract]
 
 
-def test_container_factory():
+def test_container_factory() -> None:
     c = Container()
-    c.register_factory(IService, lambda: ServiceImpl())
+    c.register_factory(IService, lambda: ServiceImpl())  # type: ignore[type-abstract]
 
-    s1 = c.resolve(IService)
-    s2 = c.resolve(IService)
+    s1 = c.resolve(IService)  # type: ignore[type-abstract]
+    s2 = c.resolve(IService)  # type: ignore[type-abstract]
     assert s1 is not s2
     assert s1.do() == "done"
 
 
-def test_resolve_missing():
+def test_resolve_missing() -> None:
     c = Container()
-    try:
-        c.resolve(IService)
-        assert False
-    except ValueError:
-        assert True
+    with pytest.raises(ValueError, match="No registration found"):
+        c.resolve(IService)  # type: ignore[type-abstract]

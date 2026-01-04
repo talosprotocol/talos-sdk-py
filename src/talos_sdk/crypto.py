@@ -30,8 +30,7 @@ def b64u_decode(data: str) -> bytes:
 
 
 class KeyPair(BaseModel):
-    """A generic keypair (Ed25519 or X25519).
-    """
+    """A generic keypair (Ed25519 or X25519)."""
 
     public_key: bytes
     private_key: bytes

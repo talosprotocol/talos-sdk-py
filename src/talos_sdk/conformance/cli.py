@@ -4,7 +4,7 @@ import sys
 from .runner import run_conformance
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Talos SDK Conformance Harness")
     parser.add_argument(
         "--vectors", required=True, help="Path to test vector JSON file"

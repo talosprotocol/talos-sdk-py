@@ -1,4 +1,3 @@
-
 from talos_sdk.ports.audit_store import (
     AuditEvent,
     EventPage,
@@ -45,7 +44,9 @@ class InMemoryAuditStore(IAuditStorePort):
 
         # We need to return an object matching EventPage Protocol
         class Page:
-            def __init__(self, events, next_cursor):
+            def __init__(
+                self, events: list[AuditEvent], next_cursor: str | None
+            ) -> None:
                 self.events = events
                 self.next_cursor = next_cursor
 
@@ -58,7 +59,7 @@ class InMemoryAuditStore(IAuditStorePort):
                 count += 1
 
         class StatObj:
-            def __init__(self, c):
+            def __init__(self, c: int) -> None:
                 self.count = c
 
         return StatObj(count)
