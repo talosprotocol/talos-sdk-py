@@ -20,13 +20,14 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import (
 
 def b64u_encode(data: bytes) -> str:
     """Base64URL encoding without padding."""
-    return base64.urlsafe_b64encode(data).decode('utf-8').rstrip('=')
+    return base64.urlsafe_b64encode(data).decode("utf-8").rstrip("=")
+
 
 def b64u_decode(data: str) -> bytes:
     """Base64URL decoding without padding."""
-    padding = '=' * (4 - (len(data) % 4))
-    if padding == '====':
-        padding = ''
+    padding = "=" * (4 - (len(data) % 4))
+    if padding == "====":
+        padding = ""
     return base64.urlsafe_b64decode(data + padding)
 
 
@@ -63,18 +64,18 @@ def generate_encryption_keypair() -> KeyPair:
     """Generate an ephemeral X25519 keypair."""
     priv = X25519PrivateKey.generate()
     pub = priv.public_key()
-    
+
     # Use Raw encoding for X25519
-    from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, PrivateFormat, NoEncryption
-    
-    pub_bytes = pub.public_bytes(
-        encoding=Encoding.Raw,
-        format=PublicFormat.Raw
+    from cryptography.hazmat.primitives.serialization import (
+        Encoding,
+        PublicFormat,
+        PrivateFormat,
+        NoEncryption,
     )
+
+    pub_bytes = pub.public_bytes(encoding=Encoding.Raw, format=PublicFormat.Raw)
     priv_bytes = priv.private_bytes(
-        encoding=Encoding.Raw,
-        format=PrivateFormat.Raw,
-        encryption_algorithm=NoEncryption()
+        encoding=Encoding.Raw, format=PrivateFormat.Raw, encryption_algorithm=NoEncryption()
     )
 
     return KeyPair(
@@ -88,7 +89,7 @@ def generate_signing_keypair() -> KeyPair:
     """Generate an Ed25519 signing keypair."""
     priv = Ed25519PrivateKey.generate()
     pub = priv.public_key()
-    
+
     pub_bytes = pub.public_bytes_raw()
     priv_bytes = priv.private_bytes_raw()
 
@@ -105,9 +106,7 @@ def sign_message(message: bytes, private_key_bytes: bytes) -> bytes:
     return priv.sign(message)
 
 
-def verify_signature(
-    message: bytes, signature: bytes, public_key_bytes: bytes
-) -> bool:
+def verify_signature(message: bytes, signature: bytes, public_key_bytes: bytes) -> bool:
     """Verify an Ed25519 signature."""
     try:
         pub = Ed25519PublicKey.from_public_bytes(public_key_bytes)

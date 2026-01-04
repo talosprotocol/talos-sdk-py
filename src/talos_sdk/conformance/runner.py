@@ -11,7 +11,7 @@ def run_conformance(vectors_path, report_path=None):
 
     # If it is a release set (list of filenames), recurse
     if "version" in data and "vectors" in data and isinstance(data["vectors"], list):
-         if len(data["vectors"]) > 0 and isinstance(data["vectors"][0], str):
+        if len(data["vectors"]) > 0 and isinstance(data["vectors"][0], str):
             base_dir = os.path.dirname(vectors_path)
             all_success = True
             for sub_vector in data["vectors"]:
@@ -45,7 +45,9 @@ def run_conformance(vectors_path, report_path=None):
             handler.run_trace(data)
             if "expected_error" in data:
                 failures += 1
-                results.append((filename, "failure", "Expected error but trace succeeded", time.time() - t0))
+                results.append(
+                    (filename, "failure", "Expected error but trace succeeded", time.time() - t0)
+                )
             else:
                 results.append((filename, "passed", None, time.time() - t0))
         except AssertionError as e:
@@ -60,7 +62,9 @@ def run_conformance(vectors_path, report_path=None):
                 msg = str(e)
                 if expected.get("message_contains") and expected["message_contains"] not in msg:
                     failures += 1
-                    results.append((filename, "failure", f"Error mismatch. Got: {msg}", time.time() - t0))
+                    results.append(
+                        (filename, "failure", f"Error mismatch. Got: {msg}", time.time() - t0)
+                    )
                 else:
                     results.append((filename, "passed", None, time.time() - t0))
             else:
@@ -84,11 +88,11 @@ def run_conformance(vectors_path, report_path=None):
 
     # Decide if we are a single vector, a trace, or a collection
     if "steps" in data:
-        pass # Already handled above
+        pass  # Already handled above
     elif "vectors" in data:
-        pass # Already handled above
+        pass  # Already handled above
     elif "negative_cases" in data:
-        pass # Already handled above
+        pass  # Already handled above
     else:
         # SINGLE VECTOR case
         total += 1
@@ -133,12 +137,16 @@ def run_conformance(vectors_path, report_path=None):
     else:
         print("OK")
         return True
+
+
 if __name__ == "__main__":
     import argparse
     import sys
 
     parser = argparse.ArgumentParser(description="Talos SDK Conformance Runner")
-    parser.add_argument("--vectors", required=True, help="Path to conformance vectors JSON or release set")
+    parser.add_argument(
+        "--vectors", required=True, help="Path to conformance vectors JSON or release set"
+    )
     parser.add_argument("--report", help="Output JUnit XML report path")
 
     args = parser.parse_args()
