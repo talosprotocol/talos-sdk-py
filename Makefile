@@ -24,12 +24,13 @@ test:
 
 conformance:
 	# Run conformance vectors
-	# Usage: make conformance RELEASE_SET=v1.1.0/common.json
-	@if [ -z "$(RELEASE_SET)" ]; then \
-		echo "Usage: make conformance RELEASE_SET=<path>"; \
-		exit 0; \
-	fi
-	talos-sdk --vectors ../talos-contracts/test_vectors/sdk/release_sets/$(RELEASE_SET) --report conformance.xml
+	# Usage: make conformance RELEASE_SET=v1.1.0.json
+	@set_val="$(RELEASE_SET)"; \
+	if [ -z "$$set_val" ]; then \
+		echo "Defaulting to RELEASE_SET=v1.1.0.json"; \
+		set_val="v1.1.0.json"; \
+	fi; \
+	talos-sdk --vectors ../talos-contracts/test_vectors/sdk/release_sets/$$set_val --report conformance.xml
 
 build:
 	python -m build
