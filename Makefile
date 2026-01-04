@@ -28,19 +28,34 @@ lint:
 
 # Clean all generated files and dependencies
 clean:
-	@echo "Cleaning..."
-	rm -rf *.egg-info
-	rm -rf build dist
-	rm -rf .venv venv
-	rm -rf .pytest_cache .ruff_cache
-	find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
-	find . -name "*.pyc" -delete 2>/dev/null || true
-	@echo "Clean complete. Ready for fresh build."
+	# Style + Types (Fail on error)
+	ruff check .
+	mypy src tests
 
-# Conformance test
+format:
+	# Auto-fix style
+	ruff format .
+	ruff check --fix .
+
+test:
+	# Unit tests (Must include happy paths)
+	pytest tests
+
 conformance:
-	@echo "Running conformance tests..."
+	# Run conformance vectors
+	# Usage: make conformance RELEASE_SET=v1.1.0/common.json
+	@if [ -z "$(RELEASE_SET)" ]; then \
+		echo "Usage: make conformance RELEASE_SET=<path>"; \
+		exit 0; \
+	fi
 	talos-sdk --vectors ../talos-contracts/test_vectors/sdk/release_sets/$(RELEASE_SET) --report conformance.xml
+
+build:
+	python -m build
+
+clean:
+	rm -rf dist build *.egg-info .pytest_cache .mypy_cache .ruff_cache
+
 
 # Doctor check
 doctor:
