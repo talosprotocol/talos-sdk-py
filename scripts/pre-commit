@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+echo "🔍 Running pre-commit checks for talos-sdk-py..."
+
+echo "1) Running pytest..."
+# Assume environment is set up. If not, user should set it up.
+# We avoid pip install to be fast, but warn if missing.
+if command -v pytest >/dev/null 2>&1; then
+    pytest
+else
+    echo "⚠️  pytest not found. Attempting python -m pytest..."
+    python3 -m pytest
+fi
+
+echo "✅ talos-sdk-py checks passed!"
