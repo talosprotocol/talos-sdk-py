@@ -29,6 +29,7 @@ from .errors import (
     TalosTransportTimeoutError,
 )
 from .mcp import SignedFrame, sign_mcp_request, verify_mcp_response
+from .mcp_client import McpClient
 from .wallet import Wallet
 
 __version__ = "1.0.0"
@@ -42,6 +43,7 @@ __all__ = [
     # Core classes
     "Wallet",
     "TalosClient",
+    "McpClient",
     "SignedFrame",
     # Functions
     "sign_mcp_request",
