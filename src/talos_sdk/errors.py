@@ -61,6 +61,13 @@ class TalosInvalidCapabilityError(TalosError):
         super().__init__("TALOS_INVALID_CAPABILITY", message, **kwargs)
 
 
+class TalosRevokedError(TalosError):
+    """Identity or key revoked."""
+
+    def __init__(self, message: str = "Identity revoked", **kwargs: Any) -> None:
+        super().__init__("TALOS_REVOKED", message, **kwargs)
+
+
 # Protocol Errors
 class TalosProtocolMismatchError(TalosError):
     """Protocol version incompatible."""

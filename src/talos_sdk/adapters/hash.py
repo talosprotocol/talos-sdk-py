@@ -10,9 +10,5 @@ class NativeHashAdapter(IHashPort):
         return hashlib.sha256(data).digest()
 
     def canonical_hash(self, obj: Any) -> bytes:
-        # Canonical JSON: keys sorted, no specific whitespace (compact)
-        # We use separators=(',', ':') to eliminate whitespace
-        canonical_json = json.dumps(
-            obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False
-        )
-        return self.sha256(canonical_json.encode("utf-8"))
+        from talos_sdk.canonical import canonical_json_bytes
+        return self.sha256(canonical_json_bytes(obj))

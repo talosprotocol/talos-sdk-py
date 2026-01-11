@@ -75,3 +75,80 @@ class TestTalosClient:
         assert "correlation_id" in response
 
         await client.close()
+
+    def test_sign_http_request(self):
+        """sign_http_request should produce strict output."""
+        from unittest.mock import Mock, patch
+        import base64
+        import json
+        
+        # Mock wallet to capture signing input
+        wallet = Mock()
+        wallet.key_id = "key-test"
+        wallet.sign.return_value = b"mock_signature_bytes"
+        
+        client = TalosClient("wss://example.com", wallet)
+        
+        # Fixed time and nonce
+        with patch('time.time', return_value=1700000000), \
+             patch('os.urandom', return_value=b'123456789012'):
+            
+            headers = client.sign_http_request(
+                method="POST",
+                path="/v1/chat",
+                query="k=v",
+                body={"foo": "bar"},
+                opcode="test.op"
+            )
+            
+            assert headers["X-Talos-Key-ID"] == "key-test"
+            assert headers["X-Talos-Timestamp"] == "1700000000"
+            assert headers["X-Talos-Sig-Alg"] == "ed25519"
+            
+            # Nonce check: base64url of b'123456789012'
+            # MTIzNDU2Nzg5MDEy -> MTIzNDU2Nzg5MDEy (unpadded?)
+            # b'123456789012' is 12 bytes.
+            expected_nonce = base64.urlsafe_b64encode(b'123456789012').decode('ascii').rstrip('=')
+            assert headers["X-Talos-Nonce"] == expected_nonce
+            
+            # Signature check: base64url of b"mock_signature_bytes"
+            expected_sig = base64.urlsafe_b64encode(b"mock_signature_bytes").decode('ascii').rstrip('=')
+            assert headers["X-Talos-Signature"] == expected_sig
+            
+            # Strict Signing Input Check
+            wallet.sign.assert_called_once()
+            args = wallet.sign.call_args[0]
+            signed_bytes = args[0]
+            
+            # Expected items
+            # body: canonical({"foo":"bar"}) -> b'{"foo":"bar"}'
+            # method: POST
+            # path_query: /v1/chat?k=v
+            # nonce: ...
+            # timestamp: 1700000000
+            # opcode: test.op
+            
+            expected_input = (
+                b'{"foo":"bar"}' + b"\n" +
+                b"POST" + b"\n" +
+                b"/v1/chat?k=v" + b"\n" +
+                expected_nonce.encode('ascii') + b"\n" +
+                b"1700000000" + b"\n" +
+                b"test.op"
+            )
+            
+            assert signed_bytes == expected_input
+
+    def test_sign_http_request_empty_body(self):
+        """sign_http_request should handle empty body correctly."""
+        from unittest.mock import Mock, patch
+        wallet = Mock()
+        wallet.key_id = "key-test"
+        wallet.sign.return_value = b"sig"
+        client = TalosClient("wss://example.com", wallet)
+        
+        with patch('time.time', return_value=1), patch('os.urandom', return_value=b'x'*12):
+             client.sign_http_request("GET", "/test", body=None)
+             
+             signed_bytes = wallet.sign.call_args[0][0]
+             assert signed_bytes.startswith(b"\n") # Empty body -> b""
