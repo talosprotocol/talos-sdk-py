@@ -4,7 +4,8 @@ import pytest
 from talos_sdk.validation import validate_identity, IdentityValidationError
 
 # Path to vectors
-VECTORS_PATH = "/Users/nileshchakraborty/workspace/study/blockchain-mcp-security/deploy/repos/talos-contracts/test_vectors/sdk/identity_validation.json"
+# Path to vectors
+VECTORS_PATH = "/Users/nileshchakraborty/workspace/study/blockchain-mcp-security/deploy/repos/talos-contracts/test_vectors/sdk/identity_vectors.json"
 
 def load_matrix():
     with open(VECTORS_PATH, "r") as f:
@@ -24,8 +25,6 @@ def get_test_cases():
 @pytest.mark.parametrize("schema_type, data, expected_valid, case_name", get_test_cases())
 def test_identity_conformance(schema_type, data, expected_valid, case_name):
     """Verify that SDK validation matches normative contract vectors."""
-    # Set contracts dir for schema loading
-    os.environ["TALOS_CONTRACTS_DIR"] = "/Users/nileshchakraborty/workspace/study/blockchain-mcp-security/deploy/repos/talos-contracts"
     
     if expected_valid:
         # Should not raise
