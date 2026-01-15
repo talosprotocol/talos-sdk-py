@@ -46,3 +46,8 @@ class KekProvider(abc.ABC):
     def decrypt(self, envelope: Envelope) -> bytes:
         """Decrypt envelope and return plaintext bytes."""
         pass
+
+def generate_master_key() -> str:
+    """Generate a stable 256-bit (32 byte) master key in hex format."""
+    import secrets
+    return secrets.token_hex(32)

@@ -1,11 +1,11 @@
 import pytest
 import binascii
 import os
-from talos_sdk.secrets.kek import Envelope, ALGORITHM_AES_256_GCM
+from talos_sdk.secrets.kek import Envelope, ALGORITHM_AES_256_GCM, generate_master_key
 from talos_sdk.secrets.local_provider import LocalKekProvider
 
-# 32 bytes hex
-MASTER_KEY = "REDACTED_FOR_SECURITY"
+# Do NOT hardcode master keys in source. Load from environment or generate for ephemeral tests.
+MASTER_KEY = os.environ.get("TALOS_MASTER_KEY", generate_master_key())
 KEY_ID = "kek-v1"
 
 @pytest.fixture
