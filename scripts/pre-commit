@@ -13,4 +13,11 @@ else
     python3 -m pytest
 fi
 
+echo "2) Scanning for hardcoded secrets..."
+if [[ -f "../../scripts/scan-secrets.sh" ]]; then
+    bash ../../scripts/scan-secrets.sh .
+else
+    echo "   ⚠️  Shared secret scanner not found (skipped)"
+fi
+
 echo "✅ talos-sdk-py checks passed!"
