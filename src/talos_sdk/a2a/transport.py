@@ -81,6 +81,16 @@ class A2ATransport:
                 if body is not None:
                     kwargs["json"] = body
 
+                # Inject Trace Context if available
+                # We check if opentelemetry is installed and a trace is active.
+                # Since SDK usage is library-based, we don't force OTEL dependency.
+                # We try import inside method or use a safer approach.
+                try:
+                    from opentelemetry import propagate
+                    propagate.inject(headers)
+                except ImportError:
+                    pass
+                
                 resp = await self._http.request(method, url, **kwargs)
             except httpx.RequestError as e:
                 if attempt == max_attempts:
