@@ -126,6 +126,11 @@ class Wallet:
         """Get the wallet name."""
         return self._name
 
+    @property
+    def key_id(self) -> str:
+        """Get the key ID (truncated DID for HTTP headers)."""
+        return self.to_did()
+
     def sign(self, message: bytes) -> bytes:
         """Sign a message using Ed25519.
 
