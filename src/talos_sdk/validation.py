@@ -34,8 +34,8 @@ def _get_schema_path(schema_name: str) -> str:
     except ImportError:
         pass
 
-    # 3. Monorepo fallback (absolute path to contracts repo)
-    monorepo_path = "/Users/nileshchakraborty/workspace/study/blockchain-mcp-security/deploy/repos/talos-contracts"
+    # 3. Monorepo fallback (relative to this file)
+    monorepo_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../../contracts"))
     path = os.path.join(monorepo_path, "schemas", "rbac", f"{schema_name}.schema.json")
     if os.path.exists(path):
         return path

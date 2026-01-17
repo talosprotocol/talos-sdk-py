@@ -5,7 +5,8 @@ from talos_sdk.validation import validate_identity, IdentityValidationError
 
 # Path to vectors
 # Path to vectors
-VECTORS_PATH = "/Users/nileshchakraborty/workspace/study/blockchain-mcp-security/deploy/repos/talos-contracts/test_vectors/sdk/identity_vectors.json"
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+VECTORS_PATH = os.path.join(ROOT_DIR, "contracts/test_vectors/sdk/identity_vectors.json")
 
 def load_matrix():
     with open(VECTORS_PATH, "r") as f:
