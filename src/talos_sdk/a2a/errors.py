@@ -54,9 +54,19 @@ class A2AFrameDigestMismatchError(A2AError):
 class A2AFrameSequenceTooFarError(A2AError):
     """Sequence number exceeds MAX_FUTURE_DELTA."""
 
-    def __init__(self, sender_seq: int = -1):
-        super().__init__("A2A_FRAME_SEQUENCE_TOO_FAR", f"Sequence too far: {sender_seq}")
+    def __init__(self, sender_seq: int = -1, expected_seq: int = -1):
+        super().__init__("A2A_FRAME_SEQUENCE_TOO_FAR", f"Sequence too far: {sender_seq}. Expected: {expected_seq}")
         self.sender_seq = sender_seq
+        self.expected_seq = expected_seq
+
+
+class A2AFrameSizeExceededError(A2AError):
+    """Frame payload exceeds maximum size."""
+
+    def __init__(self, size: int = -1, limit: int = -1):
+        super().__init__("A2A_FRAME_SIZE_EXCEEDED", f"Frame size {size} exceeds limit {limit}")
+        self.size = size
+        self.limit = limit
 
 
 class A2ACryptoNotConfiguredError(A2AError):
@@ -88,8 +98,20 @@ def raise_mapped_error(err: "ErrorResponse", status_code: int | None = None) -> 
         raise A2AFrameDigestMismatchError()
 
     if code == "A2A_FRAME_SEQUENCE_TOO_FAR":
-        seq = details.get("sender_seq", -1)
-        raise A2AFrameSequenceTooFarError(sender_seq=int(seq) if seq is not None else -1)
+        seq = details.get("sender_seq", details.get("received_seq", -1))
+        expected = details.get("expected_seq", -1)
+        raise A2AFrameSequenceTooFarError(
+            sender_seq=int(seq) if seq is not None else -1,
+            expected_seq=int(expected) if expected is not None else -1
+        )
+
+    if code == "A2A_FRAME_SIZE_EXCEEDED":
+        size = details.get("size", -1)
+        limit = details.get("limit", -1)
+        raise A2AFrameSizeExceededError(
+            size=int(size) if size is not None else -1,
+            limit=int(limit) if limit is not None else -1
+        )
 
     # Default fallback
     raise A2ATransportError(err.message, status_code=status_code)
