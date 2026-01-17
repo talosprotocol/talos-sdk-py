@@ -19,17 +19,21 @@ This directory contains runnable examples demonstrating key features of the Talo
 
 ### Core SDK
 
-| Example         | Description                             | Gateway Required |
-| --------------- | --------------------------------------- | ---------------- |
-| `quickstart.py` | Basic wallet, client, and MCP signing   | No (mock mode)   |
-| `sign_mcp.py`   | MCP request signing with audit bindings | No               |
+| Example                       | Description                                  | Gateway Required |
+| ----------------------------- | -------------------------------------------- | ---------------- |
+| `quickstart.py`               | Basic wallet, client, and MCP signing        | No (mock mode)   |
+| `sign_mcp.py`                 | MCP request signing with audit bindings      | No               |
+| `secrets_demo.py`             | Secret envelope encryption (no keys printed) | No               |
+| `session_persistence_demo.py` | Save/restore ratchet state                   | No               |
+| `multi_message_demo.py`       | 10 messages, unique digests verified         | No               |
 
 ### A2A Communication (Phase 10)
 
-| Example               | Description                        | Gateway Required |
-| --------------------- | ---------------------------------- | ---------------- |
-| `a2a_messaging.py`    | Agent-to-agent encrypted messaging | Optional         |
-| `group_management.py` | Group membership lifecycle         | Optional         |
+| Example                   | Description                        | Gateway Required |
+| ------------------------- | ---------------------------------- | ---------------- |
+| `a2a_messaging.py`        | Agent-to-agent encrypted messaging | Optional         |
+| `a2a_live_integration.py` | Full gateway integration demo      | Yes              |
+| `group_management.py`     | Group membership lifecycle         | Optional         |
 
 ## Running Examples
 
