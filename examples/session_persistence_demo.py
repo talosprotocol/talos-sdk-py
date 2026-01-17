@@ -74,13 +74,13 @@ def main():
     print_header("Step 2: Exchange Messages (Pre-Persist)")
 
     msg1 = b"Hello Bob, this is message 1"
-    ct1, _ = alice_session.encrypt(msg1)
+    ct1 = alice_session.encrypt(msg1)
     pt1 = bob_session.decrypt(ct1)
     print_info(f"Alice → Bob: {msg1.decode()}")
     assert pt1 == msg1
 
     msg2 = b"Hi Alice, got message 1"
-    ct2, _ = bob_session.encrypt(msg2)
+    ct2 = bob_session.encrypt(msg2)
     pt2 = alice_session.decrypt(ct2)
     print_info(f"Bob → Alice: {msg2.decode()}")
     assert pt2 == msg2
@@ -100,9 +100,9 @@ def main():
     alice_state_path = Path(temp_dir) / "alice_session.json"
     bob_state_path = Path(temp_dir) / "bob_session.json"
 
-    # Serialize sessions
-    alice_state = alice_session.to_json()
-    bob_state = bob_session.to_json()
+    # Serialize sessions using to_dict
+    alice_state = json.dumps(alice_session.to_dict())
+    bob_state = json.dumps(bob_session.to_dict())
 
     # Write with restrictive perms
     alice_state_path.write_text(alice_state)
@@ -125,11 +125,11 @@ def main():
     print_header("Step 4: Restore Sessions")
 
     # Simulate application restart - load from files
-    restored_alice_state = alice_state_path.read_text()
-    restored_bob_state = bob_state_path.read_text()
+    restored_alice_state = json.loads(alice_state_path.read_text())
+    restored_bob_state = json.loads(bob_state_path.read_text())
 
-    alice_restored = Session.from_json(restored_alice_state)
-    bob_restored = Session.from_json(restored_bob_state)
+    alice_restored = Session.from_dict(restored_alice_state)
+    bob_restored = Session.from_dict(restored_bob_state)
 
     print_info(f"Alice restored - msgs sent: {alice_restored.messages_sent}")
     print_info(f"Bob restored - msgs sent: {bob_restored.messages_sent}")
@@ -141,13 +141,13 @@ def main():
     print_header("Step 5: Verify Message Continuity")
 
     msg3 = b"Hello again Bob, this is message 3 after restore"
-    ct3, _ = alice_restored.encrypt(msg3)
+    ct3 = alice_restored.encrypt(msg3)
     pt3 = bob_restored.decrypt(ct3)
     print_info(f"Alice → Bob (post-restore): {msg3.decode()}")
     assert pt3 == msg3
 
     msg4 = b"Got it Alice, continuity confirmed"
-    ct4, _ = bob_restored.encrypt(msg4)
+    ct4 = bob_restored.encrypt(msg4)
     pt4 = alice_restored.decrypt(ct4)
     print_info(f"Bob → Alice (post-restore): {msg4.decode()}")
     assert pt4 == msg4
