@@ -12,8 +12,12 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 )
 from cryptography.hazmat.primitives.asymmetric.x25519 import (
     X25519PrivateKey,
+    X25519PublicKey,
 )
+from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+from cryptography.hazmat.primitives import hashes
 from pydantic import BaseModel, ConfigDict
+import os
 
 
 def b64u_encode(data: bytes) -> str:
@@ -112,3 +116,31 @@ def verify_signature(message: bytes, signature: bytes, public_key_bytes: bytes) 
         return True
     except Exception:
         return False
+
+
+def derive_shared_secret(private_key_bytes: bytes, peer_public_key_bytes: bytes) -> bytes:
+    """Derive X25519 shared secret."""
+    priv = X25519PrivateKey.from_private_bytes(private_key_bytes)
+    pub = X25519PublicKey.from_public_bytes(peer_public_key_bytes)
+    return priv.exchange(pub)
+
+
+def encrypt_message(message: bytes, key: bytes) -> tuple[bytes, bytes]:
+    """Encrypt using ChaCha20Poly1305. Returns (nonce, ciphertext)."""
+    cipher = ChaCha20Poly1305(key)
+    nonce = os.urandom(12)
+    ciphertext = cipher.encrypt(nonce, message, None)
+    return nonce, ciphertext
+
+
+def decrypt_message(ciphertext: bytes, key: bytes, nonce: bytes) -> bytes:
+    """Decrypt using ChaCha20Poly1305."""
+    cipher = ChaCha20Poly1305(key)
+    return cipher.decrypt(nonce, ciphertext, None)
+
+
+def hash_data(data: bytes) -> str:
+    """Compute SHA-256 hash (hex string)."""
+    digest = hashes.Hash(hashes.SHA256())
+    digest.update(data)
+    return digest.finalize().hex()
