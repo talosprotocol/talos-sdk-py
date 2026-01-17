@@ -24,6 +24,7 @@ from .models import (
     GroupResponse,
     SessionResponse,
 )
+from .ratchet_crypto import RatchetFrameCrypto
 from .sequence_tracker import InMemorySequenceStorage, SequenceStorage, SequenceTracker
 from .session_client import A2ASessionClient, FrameCrypto
 from .transport import A2ATransport
@@ -54,4 +55,6 @@ __all__ = [
     # Session
     "A2ASessionClient",
     "FrameCrypto",
+    # Ratchet
+    "RatchetFrameCrypto",
 ]

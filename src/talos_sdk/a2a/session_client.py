@@ -1,7 +1,10 @@
 """A2A Session Client facade with FrameCrypto hook for Phase 10.3."""
 
+import hashlib
 from datetime import datetime, timezone
 from typing import Protocol
+
+from talos_sdk.canonical import canonical_json_bytes
 
 from .errors import A2ACryptoNotConfiguredError
 from .models import EncryptedFrame, FrameListResponse, FrameSendResponse
@@ -15,15 +18,23 @@ class FrameCrypto(Protocol):
     Implement this protocol to enable send_message() and receive_messages().
     """
 
-    def encrypt(self, plaintext: bytes) -> tuple[str, str, str, str]:
+    def encrypt(self, plaintext: bytes) -> tuple[str, str, str]:
         """Encrypt plaintext and return frame components.
 
         Returns:
-            Tuple of (header_b64u, ciphertext_b64u, ciphertext_hash, frame_digest)
+            Tuple of (header_b64u, ciphertext_b64u, ciphertext_hash)
+
+        Note:
+            frame_digest is computed by session_client after reserving sender_seq.
         """
         ...
 
-    def decrypt(self, header_b64u: str, ciphertext_b64u: str) -> bytes:
+    def decrypt(
+        self,
+        header_b64u: str,
+        ciphertext_b64u: str,
+        ciphertext_hash: str | None = None,
+    ) -> bytes:
         """Decrypt frame and return plaintext."""
         ...
 
@@ -118,10 +129,21 @@ class A2ASessionClient:
         # Reserve sequence ONCE before encryption (retry-safe)
         sender_seq = self._seq_tracker.reserve()
 
-        # Encrypt using crypto hook
-        header_b64u, ciphertext_b64u, ciphertext_hash, frame_digest = (
-            self._crypto.encrypt(plaintext)
-        )
+        # Encrypt using crypto hook (returns 3 values, not 4)
+        header_b64u, ciphertext_b64u, ciphertext_hash = self._crypto.encrypt(plaintext)
+
+        # Compute frame_digest per LOCKED SPEC
+        # Preimage: {schema_id, schema_version, session_id, sender_id, sender_seq, header_b64u, ciphertext_hash}
+        preimage = {
+            "schema_id": "talos.a2a.encrypted_frame",
+            "schema_version": "v1",
+            "session_id": self._session_id,
+            "sender_id": self._sender_id,
+            "sender_seq": sender_seq,
+            "header_b64u": header_b64u,
+            "ciphertext_hash": ciphertext_hash,
+        }
+        frame_digest = hashlib.sha256(canonical_json_bytes(preimage)).hexdigest()
 
         frame = EncryptedFrame(
             session_id=self._session_id,
@@ -150,7 +172,9 @@ class A2ASessionClient:
 
         resp = await self.receive_frames(cursor)
         return [
-            self._crypto.decrypt(frame.header_b64u, frame.ciphertext_b64u)
+            self._crypto.decrypt(
+                frame.header_b64u, frame.ciphertext_b64u, frame.ciphertext_hash
+            )
             for frame in resp.items
         ]
 
