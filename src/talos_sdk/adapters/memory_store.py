@@ -38,19 +38,20 @@ class InMemoryAuditStore(IAuditStorePort):
         filters: Filters | None = None,
     ) -> EventPage:
         # Simplistic implementation: return last N events
-        # Real implementation would use cursor logic (which should be in domain, not adapter ideally, or adapter uses contract helper)
-        # For now, just slice
-        sliced = self.events[-limit:]
+        # Real implementation would use cursor logic
+        sliced = self.events[-limit:] if self.events else []
 
         # We need to return an object matching EventPage Protocol
         class Page:
             def __init__(
-                self, events: list[AuditEvent], next_cursor: str | None
+                self, events: list[AuditEvent], next_cursor: str | None, has_more: bool
             ) -> None:
                 self.events = events
                 self.next_cursor = next_cursor
+                self.has_more = has_more
 
-        return Page(sliced, None)
+        # For this simple implementation, has_more is always False
+        return Page(sliced, None, False)
 
     def stats(self, window: TimeWindow) -> Stats:
         count = 0
