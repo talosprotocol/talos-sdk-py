@@ -42,7 +42,7 @@ conformance:
 		echo "Defaulting to RELEASE_SET=v1.1.0.json"; \
 		set_val="v1.1.0.json"; \
 	fi; \
-	talos-sdk --vectors ../talos-contracts/test_vectors/sdk/release_sets/$$set_val --report conformance.xml
+	talos-sdk --vectors ../../contracts/test_vectors/sdk/release_sets/$$set_val --report conformance.xml
 
 build:
 	python -m build
