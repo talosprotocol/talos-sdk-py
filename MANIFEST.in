@@ -1,0 +1,4 @@
+include src/talos_sdk/py.typed
+include LICENSE
+include README.md
+recursive-include src/talos_sdk/ports *.py
