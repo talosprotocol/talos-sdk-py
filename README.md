@@ -21,7 +21,7 @@ The Talos SDK for Python creates a secure, encrypted tunnel for Model Context Pr
 
 ## Module Architecture
 
-```
+```text
 talos_sdk/
 ├── wallet.py        # Ed25519 identity and signing
 ├── session.py       # Double Ratchet core (Session, SessionManager)
@@ -164,6 +164,7 @@ python examples/quickstart.py --gateway-url http://localhost:8000
 
 1. [Talos Contracts](../talos-contracts/README.md)
 2. [Gateway API](../talos-ai-gateway/README.md)
+3. [Talos Wiki](https://github.com/talosprotocol/talos/wiki)
 
 ## License
 
