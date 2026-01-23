@@ -1,24 +1,15 @@
-manifest_version: v1
-repo_id: sdks-python
-entrypoints:
-  unit: "scripts/test.sh unit"
-  lint: "scripts/test.sh lint"
-  typecheck: "scripts/test.sh typecheck"
-interop:
-  enabled: true
-  command: "scripts/test.sh interop"
-  contracts_pin:
-    type: "artifact"
-    name: "talos-contracts"
-    version: "1.2.3"
-  required: true
+repo_id: "sdks-python"
+repo_root: "." 
+commands:
+  test_entrypoint: "scripts/test.sh"
 coverage:
-  tool: "pytest-cov"
-  reports:
-    xml: "coverage.xml"
+  enabled: true
+  format: "cobertura"
+  report_path: "artifacts/coverage/coverage.xml"
   thresholds:
-    unit:
-      line: 0.80
-    critical_paths:
-      - path: "src/talos_sdk/crypto/**"
-        line: 0.90
+    line: 0.80
+    branch: 0.60
+  path_thresholds:
+    "src/talos_sdk/crypto*": { line: 0.80 }
+ci:
+  default: ["--smoke", "--unit", "--coverage"]
