@@ -165,3 +165,25 @@ class RatchetFrameCrypto:
         envelope_bytes = canonical_json_bytes(envelope)
 
         return self._session.decrypt(envelope_bytes)
+
+    def get_ratchet_state(self) -> tuple[str, str]:
+        """Get current ratchet state for Gateway storage.
+
+        Returns:
+            Tuple of (ratchet_state_blob_b64u, ratchet_state_digest)
+
+        Note:
+            Gateway stores this opaque blob and returns it in responses.
+            Used for session create/accept/rotate.
+        """
+        # Serialize ratchet state to JSON bytes
+        state_json = self._session.to_dict()
+        state_bytes = canonical_json_bytes(state_json)
+
+        # Base64url encode (no padding)
+        state_b64u = b64u_encode(state_bytes)
+
+        # Compute SHA-256 digest
+        state_digest = hashlib.sha256(state_bytes).hexdigest()
+
+        return state_b64u, state_digest

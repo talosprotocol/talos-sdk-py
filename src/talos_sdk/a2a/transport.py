@@ -124,32 +124,61 @@ class A2ATransport:
     # === Session Routes ===
 
     async def create_session(
-        self, responder_id: str, *, expires_at: str | None = None
+        self,
+        responder_id: str,
+        *,
+        ratchet_state_blob_b64u: str,
+        ratchet_state_digest: str,
+        expires_at: str | None = None,
     ) -> SessionResponse:
-        """Create a new A2A session."""
-        body: dict = {"responder_id": responder_id}
+        """Create a new A2A session with ratchet state."""
+        body: dict = {
+            "responder_id": responder_id,
+            "ratchet_state_blob_b64u": ratchet_state_blob_b64u,
+            "ratchet_state_digest": ratchet_state_digest,
+        }
         if expires_at:
             body["expires_at"] = expires_at
-        data = await self._request("POST", "/a2a/v1/sessions", body)
+        data = await self._request("POST", "/a2a/sessions", body)
         return SessionResponse.model_validate(data)
 
-    async def accept_session(self, session_id: str) -> SessionResponse:
-        """Accept a pending session as responder."""
+    async def accept_session(
+        self,
+        session_id: str,
+        *,
+        ratchet_state_blob_b64u: str,
+        ratchet_state_digest: str,
+    ) -> SessionResponse:
+        """Accept a pending session as responder with ratchet state."""
+        body = {
+            "ratchet_state_blob_b64u": ratchet_state_blob_b64u,
+            "ratchet_state_digest": ratchet_state_digest,
+        }
         data = await self._request(
-            "POST", f"/a2a/v1/sessions/{session_id}/accept", {}
+            "POST", f"/a2a/sessions/{session_id}/accept", body
         )
         return SessionResponse.model_validate(data)
 
-    async def rotate_session(self, session_id: str) -> SessionResponse:
-        """Rotate session keys."""
+    async def rotate_session(
+        self,
+        session_id: str,
+        *,
+        ratchet_state_blob_b64u: str,
+        ratchet_state_digest: str,
+    ) -> SessionResponse:
+        """Rotate session keys with updated ratchet state."""
+        body = {
+            "ratchet_state_blob_b64u": ratchet_state_blob_b64u,
+            "ratchet_state_digest": ratchet_state_digest,
+        }
         data = await self._request(
-            "POST", f"/a2a/v1/sessions/{session_id}/rotate", {}
+            "POST", f"/a2a/sessions/{session_id}/rotate", body
         )
         return SessionResponse.model_validate(data)
 
     async def close_session(self, session_id: str) -> SessionResponse:
         """Close a session."""
-        data = await self._request("DELETE", f"/a2a/v1/sessions/{session_id}")
+        data = await self._request("DELETE", f"/a2a/sessions/{session_id}")
         return SessionResponse.model_validate(data)
 
     # === Frame Routes ===
@@ -160,7 +189,7 @@ class A2ATransport:
         """Send an encrypted frame."""
         body = {"frame": frame.model_dump(mode="json", exclude_none=True)}
         data = await self._request(
-            "POST", f"/a2a/v1/sessions/{session_id}/frames", body
+            "POST", f"/a2a/sessions/{session_id}/frames", body
         )
         return FrameSendResponse.model_validate(data)
 
@@ -173,7 +202,7 @@ class A2ATransport:
             params["cursor"] = cursor
         # No body for GET
         data = await self._request(
-            "GET", f"/a2a/v1/sessions/{session_id}/frames", params=params
+            "GET", f"/a2a/sessions/{session_id}/frames", params=params
         )
         return FrameListResponse.model_validate(data)
 
@@ -184,25 +213,25 @@ class A2ATransport:
         body: dict = {}
         if name:
             body["name"] = name
-        data = await self._request("POST", "/a2a/v1/groups", body)
+        data = await self._request("POST", "/a2a/groups", body)
         return GroupResponse.model_validate(data)
 
     async def add_member(self, group_id: str, member_id: str) -> GroupResponse:
         """Add a member to a group."""
         body = {"member_id": member_id}
         data = await self._request(
-            "POST", f"/a2a/v1/groups/{group_id}/members", body
+            "POST", f"/a2a/groups/{group_id}/members", body
         )
         return GroupResponse.model_validate(data)
 
     async def remove_member(self, group_id: str, member_id: str) -> GroupResponse:
         """Remove a member from a group."""
         data = await self._request(
-            "DELETE", f"/a2a/v1/groups/{group_id}/members/{member_id}"
+            "DELETE", f"/a2a/groups/{group_id}/members/{member_id}"
         )
         return GroupResponse.model_validate(data)
 
     async def close_group(self, group_id: str) -> GroupResponse:
         """Close a group."""
-        data = await self._request("DELETE", f"/a2a/v1/groups/{group_id}")
+        data = await self._request("DELETE", f"/a2a/groups/{group_id}")
         return GroupResponse.model_validate(data)

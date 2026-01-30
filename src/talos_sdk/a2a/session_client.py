@@ -38,6 +38,17 @@ class FrameCrypto(Protocol):
         """Decrypt frame and return plaintext."""
         ...
 
+    def get_ratchet_state(self) -> tuple[str, str]:
+        """Get current ratchet state for Gateway storage.
+
+        Returns:
+            Tuple of (ratchet_state_blob_b64u, ratchet_state_digest)
+
+        Note:
+            Used by session create/accept/rotate to send ratchet state to Gateway.
+        """
+        ...
+
 
 class A2ASessionClient:
     """High-level session facade for A2A communication.
@@ -179,8 +190,20 @@ class A2ASessionClient:
         ]
 
     async def rotate(self) -> None:
-        """Rotate session keys."""
-        await self._transport.rotate_session(self._session_id)
+        """Rotate session keys with current ratchet state.
+
+        Raises:
+            A2ACryptoNotConfiguredError: If crypto hook not provided.
+        """
+        if self._crypto is None:
+            raise A2ACryptoNotConfiguredError()
+
+        ratchet_blob, ratchet_digest = self._crypto.get_ratchet_state()
+        await self._transport.rotate_session(
+            self._session_id,
+            ratchet_state_blob_b64u=ratchet_blob,
+            ratchet_state_digest=ratchet_digest,
+        )
 
     async def close(self) -> None:
         """Close the session."""
@@ -192,11 +215,27 @@ class A2ASessionClient:
         transport: A2ATransport,
         sender_id: str,
         responder_id: str,
+        crypto: FrameCrypto,  # Now required (not optional)
         sequence_storage: SequenceStorage | None = None,
-        crypto: FrameCrypto | None = None,
     ) -> "A2ASessionClient":
-        """Create a new session as initiator."""
-        resp = await transport.create_session(responder_id)
+        """Create a new session as initiator with ratchet state.
+
+        Args:
+            transport: A2A transport instance
+            sender_id: This agent's ID
+            responder_id: Peer agent's ID
+            crypto: FrameCrypto instance (required for ratchet state)
+            sequence_storage: Optional sequence storage
+
+        Returns:
+            A2ASessionClient instance
+        """
+        ratchet_blob, ratchet_digest = crypto.get_ratchet_state()
+        resp = await transport.create_session(
+            responder_id,
+            ratchet_state_blob_b64u=ratchet_blob,
+            ratchet_state_digest=ratchet_digest,
+        )
         return cls(
             transport=transport,
             session_id=resp.session_id,
@@ -214,11 +253,28 @@ class A2ASessionClient:
         session_id: str,
         sender_id: str,
         initiator_id: str,
+        crypto: FrameCrypto,  # Now required (not optional)
         sequence_storage: SequenceStorage | None = None,
-        crypto: FrameCrypto | None = None,
     ) -> "A2ASessionClient":
-        """Accept a pending session as responder."""
-        await transport.accept_session(session_id)
+        """Accept a pending session as responder with ratchet state.
+
+        Args:
+            transport: A2A transport instance
+            session_id: Session ID to accept
+            sender_id: This agent's ID
+            initiator_id: Initiator's ID
+            crypto: FrameCrypto instance (required for ratchet state)
+            sequence_storage: Optional sequence storage
+
+        Returns:
+            A2ASessionClient instance
+        """
+        ratchet_blob, ratchet_digest = crypto.get_ratchet_state()
+        await transport.accept_session(
+            session_id,
+            ratchet_state_blob_b64u=ratchet_blob,
+            ratchet_state_digest=ratchet_digest,
+        )
         return cls(
             transport=transport,
             session_id=session_id,
