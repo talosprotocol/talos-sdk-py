@@ -39,6 +39,10 @@ dev = [
     "types-jsonschema>=4.18.0"
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["talos_sdk*"]
+
 [project.scripts]
 talos-sdk = "talos_sdk.conformance.cli:main"
 
