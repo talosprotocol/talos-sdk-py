@@ -30,6 +30,7 @@ from .errors import (
 )
 from .mcp import SignedFrame, sign_mcp_request, verify_mcp_response
 from .mcp_client import McpClient
+from .validation import validate_principal, validate_org, validate_team, validate_identity, IdentityValidationError
 from .wallet import Wallet
 
 __version__ = "1.0.0"
@@ -60,6 +61,11 @@ __all__ = [
     "TalosFrameInvalidError",
     "TalosCryptoError",
     "TalosInvalidInputError",
-    "TalosTransportTimeoutError",
     "TalosTransportError",
+    "TalosTransportTimeoutError",
+    "IdentityValidationError",
+    "validate_principal",
+    "validate_org",
+    "validate_team",
+    "validate_identity",
 ]
