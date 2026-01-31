@@ -16,7 +16,7 @@ class A2AError(TalosError):
 class A2ATransportError(A2AError):
     """HTTP transport failure."""
 
-    def __init__(self, message: str, status_code: int | None = None):
+    def __init__(self, message: str, status_code: int | None = None) -> None:
         super().__init__("A2A_TRANSPORT_ERROR", message)
         self.status_code = status_code
 
@@ -24,14 +24,14 @@ class A2ATransportError(A2AError):
 class A2ASessionNotFoundError(A2AError):
     """Session not found."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("A2A_SESSION_NOT_FOUND", "Session not found")
 
 
 class A2ASessionStateInvalidError(A2AError):
     """Invalid session state transition."""
 
-    def __init__(self, current_state: str = ""):
+    def __init__(self, current_state: str = "") -> None:
         super().__init__("A2A_SESSION_STATE_INVALID", f"Invalid state: {current_state}")
         self.current_state = current_state
 
@@ -39,7 +39,7 @@ class A2ASessionStateInvalidError(A2AError):
 class A2AFrameReplayError(A2AError):
     """Duplicate frame detected (replay)."""
 
-    def __init__(self, sender_seq: int = -1):
+    def __init__(self, sender_seq: int = -1) -> None:
         super().__init__("A2A_FRAME_REPLAY_DETECTED", f"Duplicate sender_seq: {sender_seq}")
         self.sender_seq = sender_seq
 
@@ -47,14 +47,14 @@ class A2AFrameReplayError(A2AError):
 class A2AFrameDigestMismatchError(A2AError):
     """Frame digest does not match computed value."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("A2A_FRAME_DIGEST_MISMATCH", "Frame digest mismatch")
 
 
 class A2AFrameSequenceTooFarError(A2AError):
     """Sequence number exceeds MAX_FUTURE_DELTA."""
 
-    def __init__(self, sender_seq: int = -1, expected_seq: int = -1):
+    def __init__(self, sender_seq: int = -1, expected_seq: int = -1) -> None:
         super().__init__("A2A_FRAME_SEQUENCE_TOO_FAR", f"Sequence too far: {sender_seq}. Expected: {expected_seq}")
         self.sender_seq = sender_seq
         self.expected_seq = expected_seq
@@ -63,7 +63,7 @@ class A2AFrameSequenceTooFarError(A2AError):
 class A2AFrameSizeExceededError(A2AError):
     """Frame payload exceeds maximum size."""
 
-    def __init__(self, size: int = -1, limit: int = -1):
+    def __init__(self, size: int = -1, limit: int = -1) -> None:
         super().__init__("A2A_FRAME_SIZE_EXCEEDED", f"Frame size {size} exceeds limit {limit}")
         self.size = size
         self.limit = limit
@@ -72,7 +72,7 @@ class A2AFrameSizeExceededError(A2AError):
 class A2ACryptoNotConfiguredError(A2AError):
     """FrameCrypto hook not configured (Phase 10.3 required)."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__("A2A_CRYPTO_NOT_CONFIGURED", "FrameCrypto not configured")
 
 

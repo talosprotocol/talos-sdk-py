@@ -4,6 +4,12 @@ Identity management as defined in SDK_CONTRACT.md.
 """
 
 import hashlib
+import time
+import base64
+import os
+from typing import Any, Dict, Optional
+
+from .canonical import canonical_json_bytes
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
@@ -163,3 +169,72 @@ class Wallet:
             return True
         except Exception:
             return False
+
+    def sign_http_request(
+        self,
+        method: str,
+        path: str,
+        query: str = "",
+        body: Dict[str, Any] | None = None,
+        opcode: str = "http.request"
+    ) -> Dict[str, str]:
+        """Sign an HTTP request for Phase 3 Attestation.
+
+        Args:
+            method: HTTP Method (e.g. POST)
+            path: Raw path (e.g. /v1/chat)
+            query: Raw query string (e.g. k=v&a=b)
+            body: Request body dict (or None)
+            opcode: Operation code (default: http.request)
+
+        Returns:
+            Dict of headers to add to the request:
+            - X-Talos-Key-ID
+            - X-Talos-Timestamp
+            - X-Talos-Nonce
+            - X-Talos-Signature
+            - X-Talos-Sig-Alg
+            - X-Talos-Sig-Version
+        """
+        # 1. Prepare inputs
+        timestamp = int(time.time())
+        nonce = base64.urlsafe_b64encode(os.urandom(12)).decode('ascii').rstrip('=')
+        
+        if body is None:
+            body_bytes = b""
+        else:
+            body_bytes = canonical_json_bytes(body)
+            
+        method_ascii = method.upper().encode('ascii')
+        
+        # Path+Query: raw string exactly as sent
+        # Expect caller to provide raw path and raw query string
+        full_path = path + (f"?{query}" if query else "")
+        path_query_ascii = full_path.encode('ascii')
+        
+        nonce_ascii = nonce.encode('ascii')
+        ts_ascii = str(timestamp).encode('ascii')
+        opcode_ascii = opcode.encode('ascii')
+        
+        # 2. Construct Signing Input (Strict Byte-Level)
+        signing_input = (
+            body_bytes + b"\n" +
+            method_ascii + b"\n" +
+            path_query_ascii + b"\n" +
+            nonce_ascii + b"\n" +
+            ts_ascii + b"\n" +
+            opcode_ascii
+        )
+        
+        # 3. Sign
+        sig_bytes = self.sign(signing_input)
+        sig_b64 = base64.urlsafe_b64encode(sig_bytes).decode('ascii').rstrip('=')
+        
+        return {
+            "X-Talos-Key-ID": self.key_id,
+            "X-Talos-Timestamp": str(timestamp),
+            "X-Talos-Nonce": nonce,
+            "X-Talos-Signature": sig_b64,
+            "X-Talos-Sig-Alg": "ed25519",
+            "X-Talos-Sig-Version": "v1"
+        }

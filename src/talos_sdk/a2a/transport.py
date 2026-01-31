@@ -4,6 +4,7 @@ import asyncio
 import random
 
 import httpx
+from typing import Dict, Any, Optional, cast
 
 from talos_sdk.wallet import Wallet
 
@@ -52,8 +53,8 @@ class A2ATransport:
             await self._http.aclose()
 
     def _sign_headers(
-        self, method: str, path: str, body: dict | None, params: dict | None
-    ) -> dict:
+        self, method: str, path: str, body: Dict[str, Any] | None, params: Dict[str, Any] | None
+    ) -> Dict[str, Any]:
         """Sign the request and return headers."""
         # Build query string for signing (canonical ordering)
         query = ""
@@ -65,9 +66,9 @@ class A2ATransport:
         self,
         method: str,
         path: str,
-        body: dict | None = None,
-        params: dict | None = None,
-    ) -> dict:
+        body: Dict[str, Any] | None = None,
+        params: Dict[str, Any] | None = None,
+    ) -> Dict[str, Any]:
         """Execute HTTP request with retry and error mapping."""
         url = f"{self._gateway_url}{path}"
         headers = self._sign_headers(method, path, body, params)
@@ -77,7 +78,7 @@ class A2ATransport:
 
         for attempt in range(1, max_attempts + 1):
             try:
-                kwargs: dict = {"params": params, "headers": headers}
+                kwargs: Dict[str, Any] = {"params": params, "headers": headers}
                 if body is not None:
                     kwargs["json"] = body
 
@@ -117,7 +118,7 @@ class A2ATransport:
                 except Exception:
                     raise A2ATransportError("Gateway error", resp.status_code)
 
-            return resp.json()
+            return cast(Dict[str, Any], resp.json())
 
         raise A2ATransportError("Unexpected transport failure")
 
@@ -132,7 +133,7 @@ class A2ATransport:
         expires_at: str | None = None,
     ) -> SessionResponse:
         """Create a new A2A session with ratchet state."""
-        body: dict = {
+        body: Dict[str, Any] = {
             "responder_id": responder_id,
             "ratchet_state_blob_b64u": ratchet_state_blob_b64u,
             "ratchet_state_digest": ratchet_state_digest,
@@ -197,7 +198,7 @@ class A2ATransport:
         self, session_id: str, *, cursor: str | None = None, limit: int = 100
     ) -> FrameListResponse:
         """Receive frames with cursor pagination."""
-        params: dict = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if cursor:
             params["cursor"] = cursor
         # No body for GET
@@ -210,7 +211,7 @@ class A2ATransport:
 
     async def create_group(self, name: str | None = None) -> GroupResponse:
         """Create a new group."""
-        body: dict = {}
+        body: Dict[str, Any] = {}
         if name:
             body["name"] = name
         data = await self._request("POST", "/a2a/groups", body)

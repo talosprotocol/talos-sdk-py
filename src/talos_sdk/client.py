@@ -5,9 +5,13 @@ High-level TalosClient facade as defined in SDK_CONTRACT.md.
 
 from typing import Any
 
-from .errors import TalosTransportError
+from .errors import TalosTransportError, TalosProtocolMismatchError
 from .mcp import SignedFrame, sign_mcp_request
 from .wallet import Wallet
+import websockets
+import json
+import asyncio
+from typing import cast
 
 # Protocol version supported by this SDK
 PROTOCOL_VERSION = "1.0"
@@ -45,6 +49,7 @@ class TalosClient:
         self._connected = False
         self._session_id: str | None = None
         self._correlation_counter = 0
+        self._ws: Any | None = None
 
     @property
     def wallet(self) -> Wallet:
@@ -74,13 +79,27 @@ class TalosClient:
             TalosTransportError: If connection fails
             TalosProtocolMismatchError: If protocol version incompatible
         """
-        # TODO: Implement actual WebSocket connection
-        # For now, mark as connected for facade completeness
-        self._connected = True
-        self._session_id = f"session-{id(self)}"
+        try:
+            self._ws = await websockets.connect(
+                self._gateway_url,
+                subprotocols=["talos.1.0"]  # type: ignore
+            )
+            self._connected = True
+            
+            # Initial Handshake could go here if needed per spec
+            # For Phase 10, we expect A2A session binding or similar
+            # But simple connection is enough for now.
+            
+            self._session_id = f"session-{id(self)}" # Ideally from handshake response
+            
+        except Exception as e:
+            raise TalosTransportError(f"Connection failed: {e}")
 
     async def close(self) -> None:
         """Gracefully close the connection."""
+        if self._ws:
+            await self._ws.close()
+            self._ws = None
         self._connected = False
         self._session_id = None
 
@@ -141,17 +160,37 @@ class TalosClient:
         Raises:
             TalosTransportError: If not connected or send fails
         """
-        if not self._connected:
+        if not self._connected or not self._ws:
             raise TalosTransportError("Not connected - call connect() first")
 
         frame = self.sign_mcp_request(request, tool, action)
 
-        # TODO: Implement actual send/receive over WebSocket
-        # For now, return a placeholder response
-        return {
-            "status": "ok",
-            "correlation_id": frame.correlation_id,
-        }
+        try:
+            # Serialize frame
+            # frame.payload is bytes (canonical JSON), signature is bytes
+            msg_json = {
+                "payload": frame.payload.decode('utf-8'),
+                "signature": frame.signature.hex(),
+                "signer_did": frame.signer_did,
+                "correlation_id": frame.correlation_id
+            }
+            await self._ws.send(json.dumps(msg_json))
+            
+            # Wait for response
+            # Simple request-response correlation for now (blocking)
+            # In real implementations, use a proper listen loop and Future map.
+            # But for simple SDK usage, we can await response.
+            resp_raw = await asyncio.wait_for(self._ws.recv(), timeout=30.0)
+            if isinstance(resp_raw, bytes):
+                resp_raw = resp_raw.decode('utf-8')
+                
+            resp = json.loads(resp_raw)
+            return cast(dict[str, Any], resp)
+            
+        except asyncio.TimeoutError:
+            raise TalosTransportError("Request timed out")
+        except Exception as e:
+            raise TalosTransportError(f"Send failed: {e}")
 
     def sign_http_request(
         self,
