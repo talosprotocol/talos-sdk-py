@@ -3,15 +3,20 @@
 High-level TalosClient facade as defined in SDK_CONTRACT.md.
 """
 
-from typing import Any
+import asyncio
+import base64
+import json
+import os
+import time
 
-from .errors import TalosTransportError, TalosProtocolMismatchError
+from typing import Any, cast
+
+import websockets
+
+from .canonical import canonical_json_bytes
+from .errors import TalosTransportError
 from .mcp import SignedFrame, sign_mcp_request
 from .wallet import Wallet
-import websockets
-import json
-import asyncio
-from typing import cast
 
 # Protocol version supported by this SDK
 PROTOCOL_VERSION = "1.0"
@@ -85,15 +90,16 @@ class TalosClient:
                 subprotocols=["talos.1.0"]  # type: ignore
             )
             self._connected = True
-            
+
             # Initial Handshake could go here if needed per spec
             # For Phase 10, we expect A2A session binding or similar
             # But simple connection is enough for now.
-            
-            self._session_id = f"session-{id(self)}" # Ideally from handshake response
-            
+
+            # Ideally from handshake response
+            self._session_id = f"session-{id(self)}"
+
         except Exception as e:
-            raise TalosTransportError(f"Connection failed: {e}")
+            raise TalosTransportError(f"Connection failed: {e}") from e
 
     async def close(self) -> None:
         """Gracefully close the connection."""
@@ -140,7 +146,6 @@ class TalosClient:
             action,
         )
 
-
     async def sign_and_send_mcp(
         self,
         request: dict[str, Any],
@@ -175,7 +180,7 @@ class TalosClient:
                 "correlation_id": frame.correlation_id
             }
             await self._ws.send(json.dumps(msg_json))
-            
+
             # Wait for response
             # Simple request-response correlation for now (blocking)
             # In real implementations, use a proper listen loop and Future map.
@@ -183,14 +188,14 @@ class TalosClient:
             resp_raw = await asyncio.wait_for(self._ws.recv(), timeout=30.0)
             if isinstance(resp_raw, bytes):
                 resp_raw = resp_raw.decode('utf-8')
-                
+
             resp = json.loads(resp_raw)
             return cast(dict[str, Any], resp)
-            
-        except asyncio.TimeoutError:
-            raise TalosTransportError("Request timed out")
+
+        except asyncio.TimeoutError as exc:
+            raise TalosTransportError("Request timed out") from exc
         except Exception as e:
-            raise TalosTransportError(f"Send failed: {e}")
+            raise TalosTransportError(f"Send failed: {e}") from e
 
     def sign_http_request(
         self,
@@ -218,32 +223,27 @@ class TalosClient:
             - X-Talos-Sig-Alg
             - X-Talos-Sig-Version
         """
-        import time
-        import base64
-        import json
-        import os
-        from .canonical import canonical_json_bytes
-        
         # 1. Prepare inputs
         timestamp = int(time.time())
-        nonce = base64.urlsafe_b64encode(os.urandom(12)).decode('ascii').rstrip('=')
-        
+        nonce_raw = base64.urlsafe_b64encode(os.urandom(12))
+        nonce = nonce_raw.decode('ascii').rstrip('=')
+
         if body is None:
             body_bytes = b""
         else:
             body_bytes = canonical_json_bytes(body)
-            
+
         method_ascii = method.upper().encode('ascii')
-        
+
         # Path+Query: raw string exactly as sent
         # Expect caller to provide raw path and raw query string
         full_path = path + (f"?{query}" if query else "")
         path_query_ascii = full_path.encode('ascii')
-        
+
         nonce_ascii = nonce.encode('ascii')
         ts_ascii = str(timestamp).encode('ascii')
         opcode_ascii = opcode.encode('ascii')
-        
+
         # 2. Construct Signing Input (Strict Byte-Level)
         signing_input = (
             body_bytes + b"\n" +
@@ -253,11 +253,12 @@ class TalosClient:
             ts_ascii + b"\n" +
             opcode_ascii
         )
-        
+
         # 3. Sign
         sig_bytes = self._wallet.sign(signing_input)
-        sig_b64 = base64.urlsafe_b64encode(sig_bytes).decode('ascii').rstrip('=')
-        
+        sig_b64 = (
+            base64.urlsafe_b64encode(sig_bytes).decode('ascii').rstrip("=")
+        )
         return {
             "X-Talos-Key-ID": self._wallet.key_id,
             "X-Talos-Timestamp": str(timestamp),

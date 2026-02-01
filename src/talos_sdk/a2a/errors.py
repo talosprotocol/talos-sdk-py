@@ -10,13 +10,14 @@ if TYPE_CHECKING:
 
 class A2AError(TalosError):
     """Base class for A2A errors."""
-    pass
 
 
 class A2ATransportError(A2AError):
     """HTTP transport failure."""
 
-    def __init__(self, message: str, status_code: int | None = None) -> None:
+    def __init__(
+        self, message: str, status_code: int | None = None
+    ) -> None:
         super().__init__("A2A_TRANSPORT_ERROR", message)
         self.status_code = status_code
 
@@ -32,7 +33,9 @@ class A2ASessionStateInvalidError(A2AError):
     """Invalid session state transition."""
 
     def __init__(self, current_state: str = "") -> None:
-        super().__init__("A2A_SESSION_STATE_INVALID", f"Invalid state: {current_state}")
+        super().__init__(
+            "A2A_SESSION_STATE_INVALID", f"Invalid state: {current_state}"
+        )
         self.current_state = current_state
 
 
@@ -40,7 +43,9 @@ class A2AFrameReplayError(A2AError):
     """Duplicate frame detected (replay)."""
 
     def __init__(self, sender_seq: int = -1) -> None:
-        super().__init__("A2A_FRAME_REPLAY_DETECTED", f"Duplicate sender_seq: {sender_seq}")
+        super().__init__(
+            "A2A_FRAME_REPLAY_DETECTED", f"Duplicate sender_seq: {sender_seq}"
+        )
         self.sender_seq = sender_seq
 
 
@@ -55,7 +60,10 @@ class A2AFrameSequenceTooFarError(A2AError):
     """Sequence number exceeds MAX_FUTURE_DELTA."""
 
     def __init__(self, sender_seq: int = -1, expected_seq: int = -1) -> None:
-        super().__init__("A2A_FRAME_SEQUENCE_TOO_FAR", f"Sequence too far: {sender_seq}. Expected: {expected_seq}")
+        super().__init__(
+            "A2A_FRAME_SEQUENCE_TOO_FAR",
+            f"Sequence too far: {sender_seq}. Expected: {expected_seq}",
+        )
         self.sender_seq = sender_seq
         self.expected_seq = expected_seq
 
@@ -64,7 +72,10 @@ class A2AFrameSizeExceededError(A2AError):
     """Frame payload exceeds maximum size."""
 
     def __init__(self, size: int = -1, limit: int = -1) -> None:
-        super().__init__("A2A_FRAME_SIZE_EXCEEDED", f"Frame size {size} exceeds limit {limit}")
+        super().__init__(
+            "A2A_FRAME_SIZE_EXCEEDED",
+            f"Frame size {size} exceeds limit {limit}",
+        )
         self.size = size
         self.limit = limit
 
@@ -73,10 +84,14 @@ class A2ACryptoNotConfiguredError(A2AError):
     """FrameCrypto hook not configured (Phase 10.3 required)."""
 
     def __init__(self) -> None:
-        super().__init__("A2A_CRYPTO_NOT_CONFIGURED", "FrameCrypto not configured")
+        super().__init__(
+            "A2A_CRYPTO_NOT_CONFIGURED", "FrameCrypto not configured"
+        )
 
 
-def raise_mapped_error(err: "ErrorResponse", status_code: int | None = None) -> None:
+def raise_mapped_error(
+    err: "ErrorResponse", status_code: int | None = None
+) -> None:
     """Map gateway ErrorResponse to SDK exception.
 
     Extracts details from err.details when available.
@@ -88,11 +103,15 @@ def raise_mapped_error(err: "ErrorResponse", status_code: int | None = None) -> 
         raise A2ASessionNotFoundError()
 
     if code == "A2A_SESSION_STATE_INVALID":
-        raise A2ASessionStateInvalidError(current_state=str(details.get("current_state", "")))
+        raise A2ASessionStateInvalidError(
+            current_state=str(details.get("current_state", ""))
+        )
 
     if code == "A2A_FRAME_REPLAY_DETECTED":
         seq = details.get("sender_seq", -1)
-        raise A2AFrameReplayError(sender_seq=int(seq) if seq is not None else -1)
+        raise A2AFrameReplayError(
+            sender_seq=int(seq) if seq is not None else -1
+        )
 
     if code == "A2A_FRAME_DIGEST_MISMATCH":
         raise A2AFrameDigestMismatchError()
@@ -102,7 +121,7 @@ def raise_mapped_error(err: "ErrorResponse", status_code: int | None = None) -> 
         expected = details.get("expected_seq", -1)
         raise A2AFrameSequenceTooFarError(
             sender_seq=int(seq) if seq is not None else -1,
-            expected_seq=int(expected) if expected is not None else -1
+            expected_seq=int(expected) if expected is not None else -1,
         )
 
     if code == "A2A_FRAME_SIZE_EXCEEDED":
@@ -110,7 +129,7 @@ def raise_mapped_error(err: "ErrorResponse", status_code: int | None = None) -> 
         limit = details.get("limit", -1)
         raise A2AFrameSizeExceededError(
             size=int(size) if size is not None else -1,
-            limit=int(limit) if limit is not None else -1
+            limit=int(limit) if limit is not None else -1,
         )
 
     # Default fallback

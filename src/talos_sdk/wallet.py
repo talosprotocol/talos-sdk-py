@@ -3,18 +3,19 @@
 Identity management as defined in SDK_CONTRACT.md.
 """
 
-import hashlib
-import time
 import base64
+import hashlib
 import os
-from typing import Any, Dict, Optional
+import time
 
-from .canonical import canonical_json_bytes
+from typing import Any, Dict
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
     Ed25519PublicKey,
 )
+
+from .canonical import canonical_json_bytes
 
 from .errors import TalosInvalidInputError
 
@@ -167,7 +168,7 @@ class Wallet:
             pk = Ed25519PublicKey.from_public_bytes(public_key)
             pk.verify(signature, message)
             return True
-        except Exception:
+        except Exception:  # noqa: E722; pylint: disable=broad-except
             return False
 
     def sign_http_request(
@@ -198,24 +199,25 @@ class Wallet:
         """
         # 1. Prepare inputs
         timestamp = int(time.time())
-        nonce = base64.urlsafe_b64encode(os.urandom(12)).decode('ascii').rstrip('=')
-        
+        nonce_raw = base64.urlsafe_b64encode(os.urandom(12))
+        nonce = nonce_raw.decode('ascii').rstrip('=')
+
         if body is None:
             body_bytes = b""
         else:
             body_bytes = canonical_json_bytes(body)
-            
+
         method_ascii = method.upper().encode('ascii')
         
         # Path+Query: raw string exactly as sent
         # Expect caller to provide raw path and raw query string
         full_path = path + (f"?{query}" if query else "")
         path_query_ascii = full_path.encode('ascii')
-        
+
         nonce_ascii = nonce.encode('ascii')
         ts_ascii = str(timestamp).encode('ascii')
         opcode_ascii = opcode.encode('ascii')
-        
+
         # 2. Construct Signing Input (Strict Byte-Level)
         signing_input = (
             body_bytes + b"\n" +
@@ -227,9 +229,12 @@ class Wallet:
         )
         
         # 3. Sign
+        # 3. Sign
         sig_bytes = self.sign(signing_input)
-        sig_b64 = base64.urlsafe_b64encode(sig_bytes).decode('ascii').rstrip('=')
-        
+        sig_b64 = (
+            base64.urlsafe_b64encode(sig_bytes).decode('ascii').rstrip('=')
+        )
+
         return {
             "X-Talos-Key-ID": self.key_id,
             "X-Talos-Timestamp": str(timestamp),
