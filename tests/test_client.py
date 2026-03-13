@@ -2,6 +2,9 @@
 Tests for the Talos SDK TalosClient.
 """
 
+import json
+from unittest.mock import AsyncMock, patch
+
 import pytest
 
 from talos_sdk import TalosClient, TalosTransportError, Wallet
@@ -36,9 +39,14 @@ class TestTalosClient:
         """connect and close should work."""
         wallet = Wallet.generate()
         client = TalosClient("wss://example.com", wallet)
+        ws = AsyncMock()
+        ws.close = AsyncMock()
 
-        await client.connect()
-        await client.close()
+        with patch("talos_sdk.client.websockets.connect", new=AsyncMock(return_value=ws)):
+            await client.connect()
+            await client.close()
+
+        ws.close.assert_awaited_once()
 
     def test_sign_mcp_request_without_connect_fails(self):
         """sign_mcp_request should fail if not connected."""
@@ -53,28 +61,35 @@ class TestTalosClient:
         """sign_mcp_request should work after connect."""
         wallet = Wallet.generate()
         client = TalosClient("wss://example.com", wallet)
+        ws = AsyncMock()
+        ws.close = AsyncMock()
 
-        await client.connect()
-        frame = client.sign_mcp_request({"method": "test"}, "tool", "action")
+        with patch("talos_sdk.client.websockets.connect", new=AsyncMock(return_value=ws)):
+            await client.connect()
+            frame = client.sign_mcp_request({"method": "test"}, "tool", "action")
 
-        assert frame.correlation_id.startswith("corr-")
-        assert len(frame.signature) == 64
+            assert frame.correlation_id.startswith("corr-")
+            assert len(frame.signature) == 64
 
-        await client.close()
+            await client.close()
 
     @pytest.mark.asyncio
     async def test_sign_and_send_mcp(self):
         """sign_and_send_mcp should return response."""
         wallet = Wallet.generate()
         client = TalosClient("wss://example.com", wallet)
+        ws = AsyncMock()
+        ws.close = AsyncMock()
+        ws.recv = AsyncMock(return_value=json.dumps({"status": "ok", "correlation_id": "corr-1"}))
 
-        await client.connect()
-        response = await client.sign_and_send_mcp({"method": "test"}, "tool", "action")
+        with patch("talos_sdk.client.websockets.connect", new=AsyncMock(return_value=ws)):
+            await client.connect()
+            response = await client.sign_and_send_mcp({"method": "test"}, "tool", "action")
 
-        assert response["status"] == "ok"
-        assert "correlation_id" in response
+            assert response["status"] == "ok"
+            assert "correlation_id" in response
 
-        await client.close()
+            await client.close()
 
     def test_sign_http_request(self):
         """sign_http_request should produce strict output."""

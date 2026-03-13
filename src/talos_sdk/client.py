@@ -246,12 +246,17 @@ class TalosClient:
 
         # 2. Construct Signing Input (Strict Byte-Level)
         signing_input = (
-            body_bytes + b"\n" +
-            method_ascii + b"\n" +
-            path_query_ascii + b"\n" +
-            nonce_ascii + b"\n" +
-            ts_ascii + b"\n" +
-            opcode_ascii
+            body_bytes
+            + b"\n"
+            + method_ascii
+            + b"\n"
+            + path_query_ascii
+            + b"\n"
+            + nonce_ascii
+            + b"\n"
+            + ts_ascii
+            + b"\n"
+            + opcode_ascii
         )
 
         # 3. Sign
