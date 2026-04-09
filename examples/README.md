@@ -33,6 +33,8 @@ This directory contains runnable examples demonstrating key features of the Talo
 | ------------------------- | ---------------------------------- | ---------------- |
 | `a2a_messaging.py`        | Agent-to-agent encrypted messaging | Optional         |
 | `a2a_live_integration.py` | Full gateway integration demo      | Yes              |
+| `a2a_v1_live_interop.py`  | Canonical A2A v1 RPC smoke, including optional streaming checks | Yes |
+| `a2a_v1_reference_server.py` | Local reference-style A2A v1 fixture server | No |
 | `group_management.py`     | Group membership lifecycle         | Optional         |
 
 ## Running Examples
@@ -60,6 +62,16 @@ python examples/quickstart.py --gateway-url http://localhost:8000
 
 # A2A messaging (Double Ratchet)
 python examples/a2a_messaging.py --verbose
+
+# Canonical A2A v1 interop smoke against the local reference fixture
+python examples/a2a_v1_reference_server.py --port 8011 --api-token sdk-token
+PYTHONPATH=src python examples/a2a_v1_live_interop.py --gateway-url http://127.0.0.1:8011 --api-token sdk-token --prompt "hello" --exercise-streams
+
+# Official upstream Python v0.3.0 sample interop smoke
+PYTHONPATH=src python examples/a2a_v1_live_interop.py --gateway-url http://127.0.0.1:9999 --interop-profile upstream_v0_3 --prompt "hello" --exercise-streams
+
+# Official upstream Java sample interop smoke
+PYTHONPATH=src python examples/a2a_v1_live_interop.py --gateway-url http://127.0.0.1:9999 --interop-profile upstream_java_hybrid --prompt "hello" --exercise-streams
 ```
 
 ## Security Notes
