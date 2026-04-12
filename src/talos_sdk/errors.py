@@ -2,6 +2,7 @@
 
 Canonical error taxonomy as defined in SDK_CONTRACT.md.
 """
+from __future__ import annotations
 
 from typing import Any
 
