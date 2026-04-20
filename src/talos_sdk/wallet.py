@@ -3,7 +3,6 @@
 Identity management as defined in SDK_CONTRACT.md.
 """
 
-import base64
 import hashlib
 import os
 import time
@@ -14,6 +13,7 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
     Ed25519PublicKey,
 )
+from talos_contracts import base64url_encode
 
 from .canonical import canonical_json_bytes
 
@@ -199,8 +199,7 @@ class Wallet:
         """
         # 1. Prepare inputs
         timestamp = int(time.time())
-        nonce_raw = base64.urlsafe_b64encode(os.urandom(12))
-        nonce = nonce_raw.decode('ascii').rstrip('=')
+        nonce = base64url_encode(os.urandom(12))
 
         if body is None:
             body_bytes = b""
@@ -229,11 +228,8 @@ class Wallet:
         )
         
         # 3. Sign
-        # 3. Sign
         sig_bytes = self.sign(signing_input)
-        sig_b64 = (
-            base64.urlsafe_b64encode(sig_bytes).decode('ascii').rstrip('=')
-        )
+        sig_b64 = base64url_encode(sig_bytes)
 
         return {
             "X-Talos-Key-ID": self.key_id,
