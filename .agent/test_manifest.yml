@@ -12,4 +12,4 @@ coverage:
   path_thresholds:
     "src/talos_sdk/crypto*": { line: 0.80 }
 ci:
-  default: ["--smoke", "--unit", "--coverage"]
+  default: ["--ci"]
