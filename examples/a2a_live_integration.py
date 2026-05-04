@@ -33,8 +33,7 @@ from _common import (
 )
 
 from talos_sdk import Wallet, TalosClient
-from talos_sdk.a2a import A2ATransport, A2ASessionClient, RatchetFrameCrypto
-from talos_sdk.a2a.ratchet_crypto import NONCE_LEN
+from talos_sdk.a2a import A2ATransport, RatchetFrameCrypto
 from talos_sdk.canonical import canonical_json_bytes
 from talos_sdk.crypto import generate_signing_keypair
 from talos_sdk.session import SessionManager

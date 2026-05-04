@@ -13,7 +13,6 @@ Uso:
 """
 
 import json
-import os
 import socket
 import subprocess
 import sys
@@ -33,7 +32,7 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).parent))
 from config import (
     BROWSER_NAMES, CLAUDE_NAMES, API_ENDPOINT,
-    THRESHOLDS, classify
+    classify
 )
 
 

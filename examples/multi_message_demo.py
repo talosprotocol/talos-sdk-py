@@ -27,7 +27,6 @@ from _common import (
     print_header,
     print_success,
     print_info,
-    print_warning,
 )
 
 from talos_sdk.a2a.ratchet_crypto import RatchetFrameCrypto

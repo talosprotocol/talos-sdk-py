@@ -1,23 +1,14 @@
 import base64
-import json
+import base64
 from typing import Any
 
 from talos_sdk.canonical import canonical_json_bytes
-from talos_sdk.crypto import KeyPair
+from talos_sdk.crypto import KeyPair, b64u_decode as base64url_decode, b64u_encode as base64url_encode
 from talos_sdk.errors import TalosError
 from talos_sdk.mcp import sign_mcp_request
 from talos_sdk.session import PrekeyBundle, Session, SessionManager
 from talos_sdk.wallet import Wallet
 
-
-def base64url_decode(s: str) -> bytes:
-    # Fix padding
-    s += "=" * ((4 - len(s) % 4) % 4)
-    return base64.urlsafe_b64decode(s)
-
-
-def base64url_encode(b: bytes) -> str:
-    return base64.urlsafe_b64encode(b).decode("utf-8").rstrip("=")
 
 
 class BaseHandler:

@@ -20,7 +20,7 @@ from pathlib import Path
 # Add src for SDK imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from talos_sdk import Wallet, TalosClient
+from talos_sdk import Wallet
 from talos_sdk.a2a.ratchet_crypto import RatchetFrameCrypto
 from talos_sdk.canonical import canonical_json_bytes
 from talos_sdk.crypto import generate_signing_keypair

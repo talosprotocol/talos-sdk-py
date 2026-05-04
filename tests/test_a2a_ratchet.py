@@ -1,7 +1,7 @@
 """Unit tests for RatchetFrameCrypto (Phase 10.3)."""
 
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 import json
 import hashlib
 

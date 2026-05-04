@@ -95,7 +95,6 @@ class TestTalosClient:
         """sign_http_request should produce strict output."""
         from unittest.mock import Mock, patch
         import base64
-        import json
         
         # Mock wallet to capture signing input
         wallet = Mock()

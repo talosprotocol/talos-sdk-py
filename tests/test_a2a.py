@@ -1,8 +1,7 @@
 """Unit tests for A2A module."""
 
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
-from datetime import datetime, timezone
+from unittest.mock import MagicMock
 import threading
 
 from talos_sdk.a2a.errors import (
@@ -16,15 +15,11 @@ from talos_sdk.a2a.errors import (
 )
 from talos_sdk.a2a.models import (
     EncryptedFrame,
-    SessionResponse,
-    FrameSendResponse,
-    FrameListResponse,
     ErrorResponse,
 )
 from talos_sdk.a2a.sequence_tracker import (
     SequenceTracker,
     InMemorySequenceStorage,
-    _DEFAULT_STORAGE,
 )
 
 

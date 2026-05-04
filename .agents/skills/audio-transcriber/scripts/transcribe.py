@@ -6,7 +6,6 @@ Transcreve áudio para texto e gera atas/resumos usando LLM.
 
 import os
 import sys
-import json
 import subprocess
 import shutil
 from datetime import datetime
@@ -27,8 +26,7 @@ except ImportError:
     from rich.console import Console
     from rich.prompt import Prompt
     from rich.panel import Panel
-    from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
-    from rich import print as rprint
+    from rich.progress import Progress, SpinnerColumn, TextColumn
 
 # tqdm for progress bars
 try:

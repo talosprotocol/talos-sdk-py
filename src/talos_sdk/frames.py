@@ -1,18 +1,10 @@
 """Framing logic for Talos SDK."""
 
-import base64
 import json
 
 from .canonical import canonical_json_bytes
-
-
-def base64url_encode(b: bytes) -> str:
-    return base64.urlsafe_b64encode(b).decode("utf-8").rstrip("=")
-
-
-def base64url_decode(s: str) -> bytes:
-    s += "=" * ((4 - len(s) % 4) % 4)
-    return base64.urlsafe_b64decode(s)
+from .crypto import b64u_decode as base64url_decode
+from .crypto import b64u_encode as base64url_encode
 
 
 class Frame:

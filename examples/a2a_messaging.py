@@ -26,8 +26,7 @@ from _common import (
     print_warning,
 )
 
-from talos_sdk.a2a.ratchet_crypto import RatchetFrameCrypto, NONCE_LEN
-from talos_sdk.a2a.models import GroupResponse
+from talos_sdk.a2a.ratchet_crypto import RatchetFrameCrypto
 from talos_sdk.canonical import canonical_json_bytes
 from talos_sdk.crypto import generate_signing_keypair
 from talos_sdk.session import SessionManager

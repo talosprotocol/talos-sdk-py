@@ -4,7 +4,7 @@ import asyncio
 import random
 
 import httpx
-from typing import Dict, Any, Optional, cast
+from typing import Dict, Any, cast
 
 from talos_sdk.wallet import Wallet
 

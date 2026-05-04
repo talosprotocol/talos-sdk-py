@@ -3,7 +3,7 @@
 import json
 import os
 from typing import Any
-from jsonschema import validate, ValidationError, Draft201909Validator
+from jsonschema import ValidationError, Draft201909Validator
 from .errors import TalosInvalidInputError
 
 class IdentityValidationError(TalosInvalidInputError):

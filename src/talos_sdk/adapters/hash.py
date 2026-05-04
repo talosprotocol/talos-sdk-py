@@ -1,5 +1,4 @@
 import hashlib
-import json
 from typing import Any
 
 from talos_sdk.ports.hash import IHashPort

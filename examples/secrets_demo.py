@@ -31,7 +31,7 @@ from _common import (
     print_warning,
 )
 
-from talos_sdk.secrets import SecretsEnvelope, encrypt_envelope, decrypt_envelope
+from talos_sdk.secrets import encrypt_envelope, decrypt_envelope
 
 
 def main():
