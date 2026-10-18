@@ -1,16 +1,18 @@
+import json
+from typing import Any
+
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.testclient import TestClient
 
 from talos_sdk import (
-    A2AJsonRpcClient,
-    A2AJsonRpcError,
     TALOS_ATTESTATION_EXTENSION,
     TALOS_COMPAT_JSONRPC_EXTENSION,
     TALOS_SECURE_CHANNELS_EXTENSION,
+    A2AJsonRpcClient,
+    A2AJsonRpcError,
 )
 from talos_sdk import a2a_v1 as a2a_v1_module
-import json
 
 
 def _app() -> FastAPI:
@@ -46,7 +48,9 @@ def _app() -> FastAPI:
         }
 
     @app.get("/extendedAgentCard")
-    def get_extended_agent_card(authorization: str | None = Header(default=None)):
+    def get_extended_agent_card(
+        authorization: str | None = Header(default=None),
+    ) -> dict[str, Any]:
         if authorization != "Bearer sdk-token":
             raise HTTPException(status_code=401, detail="Unauthorized")
         return {
@@ -76,8 +80,8 @@ def _app() -> FastAPI:
             "securityRequirements": [{"bearerAuth": []}],
         }
 
-    @app.post("/rpc")
-    def rpc(payload: dict):
+    @app.post("/rpc", response_model=None)
+    def rpc(payload: dict[str, Any]) -> dict[str, Any] | StreamingResponse:
         method = payload["method"]
         if method == "GetExtendedAgentCard":
             return {
@@ -190,8 +194,8 @@ def _v03_app() -> FastAPI:
             },
         }
 
-    @app.post("/")
-    def rpc(payload: dict):
+    @app.post("/", response_model=None)
+    def rpc(payload: dict[str, Any]) -> dict[str, Any] | StreamingResponse:
         method = payload["method"]
         if method == "agent/getAuthenticatedExtendedCard":
             return {
@@ -311,8 +315,8 @@ def _java_hybrid_app() -> FastAPI:
             },
         }
 
-    @app.post("/")
-    def rpc(payload: dict):
+    @app.post("/", response_model=None)
+    def rpc(payload: dict[str, Any]) -> dict[str, Any] | StreamingResponse:
         method = payload["method"]
         if method == "SendMessage":
             message = payload["params"]["message"]

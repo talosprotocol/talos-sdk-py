@@ -23,16 +23,16 @@ sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from _common import (
-    parse_common_args,
     check_gateway,
-    safe_print,
-    print_header,
-    print_success,
-    print_info,
+    parse_common_args,
     print_error,
+    print_header,
+    print_info,
+    print_success,
+    safe_print,
 )
 
-from talos_sdk import Wallet, TalosClient
+from talos_sdk import TalosClient, Wallet
 from talos_sdk.a2a import A2ATransport, RatchetFrameCrypto
 from talos_sdk.canonical import canonical_json_bytes
 from talos_sdk.crypto import generate_signing_keypair

@@ -74,8 +74,8 @@ def check_gateway(url: str, timeout: int = 5) -> bool:
     Returns:
         True if gateway is reachable, exits with code 1 otherwise.
     """
-    import urllib.request
     import urllib.error
+    import urllib.request
 
     health_url = f"{url}/health"
     print(f"🔍 Checking gateway at {url}...")

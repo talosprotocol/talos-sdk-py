@@ -1,5 +1,8 @@
 name: CI
 
+env:
+    TALOS_CONTRACTS_DIR: ${{ github.workspace }}/.ci/contracts
+
 on:
     push:
         branches: [main]
@@ -13,18 +16,28 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Checkout contracts fixtures
+              uses: actions/checkout@v4
+              with:
+                  repository: talosprotocol/talos-contracts
+                  ref: c5f90430da9e2356a1a3d0c78031ff0e885d1cbd
+                  path: .ci/contracts
+                  persist-credentials: false
+
             - uses: actions/setup-python@v5
               with:
                   python-version: "3.11"
 
             - name: Install dependencies
-              run: pip install ruff mypy
+              run: |
+                  pip install "$TALOS_CONTRACTS_DIR/python"
+                  pip install -e ".[dev]"
 
             - name: Run Ruff
               run: ruff check .
 
             - name: Run MyPy
-              run: mypy . --ignore-missing-imports
+              run: mypy src tests --ignore-missing-imports
 
     test:
         name: Test
@@ -32,12 +45,22 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Checkout contracts fixtures
+              uses: actions/checkout@v4
+              with:
+                  repository: talosprotocol/talos-contracts
+                  ref: c5f90430da9e2356a1a3d0c78031ff0e885d1cbd
+                  path: .ci/contracts
+                  persist-credentials: false
+
             - uses: actions/setup-python@v5
               with:
                   python-version: "3.11"
 
             - name: Install dependencies
-              run: pip install -e ".[dev]"
+              run: |
+                  pip install "$TALOS_CONTRACTS_DIR/python"
+                  pip install -e ".[dev]"
 
             - name: Run tests
               run: pytest -v --cov=talos_sdk --cov-report=term-missing

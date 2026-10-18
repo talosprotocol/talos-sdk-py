@@ -24,18 +24,18 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from _common import (
     parse_common_args,
-    safe_print,
     print_header,
-    print_success,
     print_info,
+    print_success,
     print_warning,
+    safe_print,
 )
 
-from talos_sdk.secrets import encrypt_envelope, decrypt_envelope
+from talos_sdk.secrets import decrypt_envelope, encrypt_envelope
 
 
 def main():
-    args = parse_common_args(description="Talos Secrets Envelope Demo")
+    parse_common_args(description="Talos Secrets Envelope Demo")
 
     print_header("Talos Secrets Envelope Encryption Demo")
     print_warning("No plaintext, KEKs, DEKs, or raw ciphertext will be displayed.")
@@ -50,7 +50,7 @@ def main():
     kek_id_v1 = "kek-v1"
 
     print_info(f"KEK ID: {kek_id_v1}")
-    print_info(f"KEK size: 256 bits")
+    print_info("KEK size: 256 bits")
     print_success("KEK loaded (never printed)")
 
     # =========================================================================

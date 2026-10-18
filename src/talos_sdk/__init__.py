@@ -15,14 +15,14 @@ Example:
     ... )
 """
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .a2a_v1 import (
-    A2AJsonRpcClient,
-    A2AJsonRpcError,
     TALOS_ATTESTATION_EXTENSION,
     TALOS_COMPAT_JSONRPC_EXTENSION,
     TALOS_SECURE_CHANNELS_EXTENSION,
+    A2AJsonRpcClient,
+    A2AJsonRpcError,
 )
 from .canonical import canonical_json, canonical_json_bytes
 from .errors import (
@@ -59,31 +59,10 @@ def _missing_optional_function(name: str, dependency: str, exc: ModuleNotFoundEr
     return _missing_optional_dependency
 
 
-try:
-    from .wallet import Wallet
-except ModuleNotFoundError as exc:
-    Wallet = _missing_optional_class("Wallet", "cryptography", exc)
-
-try:
-    from .mcp import SignedFrame, sign_mcp_request, verify_mcp_response
-except ModuleNotFoundError as exc:
-    SignedFrame = _missing_optional_class("SignedFrame", "cryptography", exc)
-    sign_mcp_request = _missing_optional_function("sign_mcp_request", "cryptography", exc)
-    verify_mcp_response = _missing_optional_function("verify_mcp_response", "cryptography", exc)
-
-
-try:
+if TYPE_CHECKING:
     from .client import PROTOCOL_VERSION, TalosClient
-except ModuleNotFoundError as exc:
-    PROTOCOL_VERSION = "1.0"
-    TalosClient = _missing_optional_class("TalosClient", "websockets", exc)
-
-try:
+    from .mcp import SignedFrame, sign_mcp_request, verify_mcp_response
     from .mcp_client import McpClient
-except ModuleNotFoundError as exc:
-    McpClient = _missing_optional_class("McpClient", "requests", exc)
-
-try:
     from .validation import (
         IdentityValidationError,
         validate_identity,
@@ -91,14 +70,47 @@ try:
         validate_principal,
         validate_team,
     )
-except ModuleNotFoundError as exc:
-    IdentityValidationError = _missing_optional_class(
-        "IdentityValidationError", "jsonschema", exc
-    )
-    validate_principal = _missing_optional_function("validate_principal", "jsonschema", exc)
-    validate_org = _missing_optional_function("validate_org", "jsonschema", exc)
-    validate_team = _missing_optional_function("validate_team", "jsonschema", exc)
-    validate_identity = _missing_optional_function("validate_identity", "jsonschema", exc)
+    from .wallet import Wallet
+else:
+    try:
+        from .wallet import Wallet
+    except ModuleNotFoundError as exc:
+        Wallet = _missing_optional_class("Wallet", "cryptography", exc)
+
+    try:
+        from .mcp import SignedFrame, sign_mcp_request, verify_mcp_response
+    except ModuleNotFoundError as exc:
+        SignedFrame = _missing_optional_class("SignedFrame", "cryptography", exc)
+        sign_mcp_request = _missing_optional_function("sign_mcp_request", "cryptography", exc)
+        verify_mcp_response = _missing_optional_function("verify_mcp_response", "cryptography", exc)
+
+    try:
+        from .client import PROTOCOL_VERSION, TalosClient
+    except ModuleNotFoundError as exc:
+        PROTOCOL_VERSION = "1.0"
+        TalosClient = _missing_optional_class("TalosClient", "websockets", exc)
+
+    try:
+        from .mcp_client import McpClient
+    except ModuleNotFoundError as exc:
+        McpClient = _missing_optional_class("McpClient", "requests", exc)
+
+    try:
+        from .validation import (
+            IdentityValidationError,
+            validate_identity,
+            validate_org,
+            validate_principal,
+            validate_team,
+        )
+    except ModuleNotFoundError as exc:
+        IdentityValidationError = _missing_optional_class(
+            "IdentityValidationError", "jsonschema", exc
+        )
+        validate_principal = _missing_optional_function("validate_principal", "jsonschema", exc)
+        validate_org = _missing_optional_function("validate_org", "jsonschema", exc)
+        validate_team = _missing_optional_function("validate_team", "jsonschema", exc)
+        validate_identity = _missing_optional_function("validate_identity", "jsonschema", exc)
 
 __version__ = "1.0.0"
 
