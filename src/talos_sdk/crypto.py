@@ -4,10 +4,8 @@ Provides wrappers for X25519, Ed25519, and common utilities.
 """
 
 import base64
-import os
 from typing import Any
 
-from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
     Ed25519PublicKey,
@@ -17,7 +15,9 @@ from cryptography.hazmat.primitives.asymmetric.x25519 import (
     X25519PublicKey,
 )
 from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+from cryptography.hazmat.primitives import hashes
 from pydantic import BaseModel, ConfigDict
+import os
 
 
 def b64u_encode(data: bytes) -> str:

@@ -8,6 +8,7 @@ import base64
 import json
 import os
 import time
+
 from typing import Any, cast
 
 import websockets

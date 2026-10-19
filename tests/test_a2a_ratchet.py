@@ -1,17 +1,17 @@
 """Unit tests for RatchetFrameCrypto (Phase 10.3)."""
 
-import hashlib
-import json
-from unittest.mock import MagicMock
-
 import pytest
+from unittest.mock import MagicMock
+import json
+import hashlib
 
 from talos_sdk.a2a.ratchet_crypto import (
-    NONCE_LEN,
     RatchetFrameCrypto,
     _b64u_decode_strict,
+    NONCE_LEN,
 )
 from talos_sdk.crypto import b64u_encode
+
 
 # === Base64url Strict Decode Tests ===
 
@@ -95,7 +95,7 @@ class TestRatchetFrameCrypto:
 
         # Decode and split
         combined = _b64u_decode_strict(ciphertext_b64u)
-        _nonce = combined[:NONCE_LEN]
+        nonce = combined[:NONCE_LEN]
         ciphertext = combined[NONCE_LEN:]
 
         # Hash should be of ciphertext only

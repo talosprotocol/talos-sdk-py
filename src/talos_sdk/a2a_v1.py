@@ -7,13 +7,11 @@ import uuid
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
-from types import ModuleType
 from typing import Any, Literal
 from urllib import error as urllib_error
 from urllib import request as urllib_request
 from urllib.parse import urljoin, urlsplit, urlunsplit
 
-_requests: ModuleType | None
 try:
     import requests as _requests
 except ModuleNotFoundError:  # pragma: no cover - exercised in source-tree live smoke
@@ -408,7 +406,10 @@ class A2AJsonRpcClient:
                 text = line.decode("utf-8") if isinstance(line, bytes) else str(line)
                 if not text.startswith("data:"):
                     continue
-                payload = json.loads(text[5:])
+                data = text[5:]
+                if not data.strip():
+                    continue
+                payload = json.loads(data)
                 yield self._extract_result(payload)
 
     def _message(
@@ -518,12 +519,9 @@ class A2AJsonRpcClient:
             interfaces = card.get("supportedInterfaces")
             if isinstance(interfaces, list):
                 for item in interfaces:
-                    if isinstance(item, dict):
-                        url = item.get("url")
-                        if isinstance(url, str):
-                            return url
-        url = card.get("url")
-        return url if isinstance(url, str) else "/"
+                    if isinstance(item, dict) and isinstance(item.get("url"), str):
+                        return item["url"]
+        return card.get("url") if isinstance(card.get("url"), str) else "/"
 
     def _normalize_localhost_url(self, value: str) -> str:
         base = urlsplit(self.base_url)

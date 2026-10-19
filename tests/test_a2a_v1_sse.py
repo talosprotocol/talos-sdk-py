@@ -1,5 +1,6 @@
 """Regression coverage for optional whitespace in SSE data fields."""
 
+import json
 from collections.abc import Iterator
 from typing import Any
 
@@ -70,4 +71,34 @@ def test_stream_preserves_jsonrpc_errors_with_optional_data_space(
         list(client.subscribe_to_task("task-1"))
 
     assert error.value.code == -32001
+    assert response.closed
+
+
+@pytest.mark.parametrize("empty_data", ["data:", "data: ", "data:\t"])
+@pytest.mark.parametrize("as_bytes", [False, True], ids=["text", "bytes"])
+def test_stream_skips_empty_data_before_valid_event(
+    empty_data: str, as_bytes: bool
+) -> None:
+    event = 'data:{"jsonrpc":"2.0","id":"evt-1","result":{"index":1}}'
+    text_lines = [empty_data, "", event, ""]
+    lines: list[bytes | str] = [
+        line.encode() if as_bytes else line for line in text_lines
+    ]
+    response = _StreamResponse(lines)
+    client = A2AJsonRpcClient("http://testserver", http=_HttpClient(response))
+
+    assert list(client.subscribe_to_task("task-1")) == [{"index": 1}]
+    assert response.closed
+
+
+@pytest.mark.parametrize("as_bytes", [False, True], ids=["text", "bytes"])
+def test_stream_preserves_nonempty_invalid_json_error(as_bytes: bool) -> None:
+    event = "data:{invalid json}"
+    lines: list[bytes | str] = [event.encode() if as_bytes else event, b""]
+    response = _StreamResponse(lines)
+    client = A2AJsonRpcClient("http://testserver", http=_HttpClient(response))
+
+    with pytest.raises(json.JSONDecodeError):
+        list(client.subscribe_to_task("task-1"))
+
     assert response.closed

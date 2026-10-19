@@ -25,11 +25,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from _common import (
     parse_common_args,
-    print_header,
-    print_info,
-    print_success,
-    print_warning,
     safe_print,
+    print_header,
+    print_success,
+    print_info,
+    print_warning,
 )
 
 from talos_sdk.a2a.models import GroupResponse
@@ -71,7 +71,7 @@ def create_group_event(
 
 
 def main():
-    parse_common_args(description="Talos A2A Group Management Example")
+    args = parse_common_args(description="Talos A2A Group Management Example")
 
     print_header("Talos A2A Group Management Example")
     print_warning("Note: This demonstrates governance/membership only.")
@@ -187,9 +187,9 @@ def main():
     print("📊 Final State:")
     print(f"   Group ID:     {group.group_id}")
     print(f"   Owner:        {group.owner_id}")
-    print("   State:        CLOSED")
-    print("   Total events: 5")
-    print("   Current members: alice-agent (bob-agent removed)")
+    print(f"   State:        CLOSED")
+    print(f"   Total events: 5")
+    print(f"   Current members: alice-agent (bob-agent removed)")
 
     print("\n✅ MVP Group lifecycle demonstrated:")
     print("   - [x] Create group")

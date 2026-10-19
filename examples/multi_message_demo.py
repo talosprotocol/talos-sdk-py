@@ -23,10 +23,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from _common import (
     parse_common_args,
-    print_header,
-    print_info,
-    print_success,
     safe_print,
+    print_header,
+    print_success,
+    print_info,
 )
 
 from talos_sdk.a2a.ratchet_crypto import RatchetFrameCrypto

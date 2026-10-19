@@ -1,20 +1,15 @@
 import json
 import os
-from pathlib import Path
-
 import pytest
+from talos_sdk.validation import validate_identity, IdentityValidationError
 
-from talos_sdk.validation import IdentityValidationError, validate_identity
-
-CONTRACTS_DIR = Path(
-    os.environ.get(
-        "TALOS_CONTRACTS_DIR", Path(__file__).resolve().parents[3] / "contracts"
-    )
-)
-VECTORS_PATH = CONTRACTS_DIR / "test_vectors/sdk/identity_vectors.json"
+# Path to vectors
+# Path to vectors
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
+VECTORS_PATH = os.path.join(ROOT_DIR, "contracts/test_vectors/sdk/identity_vectors.json")
 
 def load_matrix():
-    with open(VECTORS_PATH) as f:
+    with open(VECTORS_PATH, "r") as f:
         return json.load(f)
 
 MATRIX = load_matrix()
@@ -31,7 +26,7 @@ def get_test_cases():
 @pytest.mark.parametrize("schema_type, data, expected_valid, case_name", get_test_cases())
 def test_identity_conformance(schema_type, data, expected_valid, case_name):
     """Verify that SDK validation matches normative contract vectors."""
-
+    
     if expected_valid:
         # Should not raise
         validate_identity(data, schema_type)

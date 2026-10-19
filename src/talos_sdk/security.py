@@ -2,7 +2,7 @@
 
 import time
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional, Union
 
 from .canonical import canonical_json_bytes
 from .crypto import b64u_decode as base64url_decode
@@ -23,27 +23,20 @@ class Capability:
 
     # --- Backward Compatibility Aliases (Deprecated) ---
     @property
-    def v(self) -> object:
-        return self.version
+    def v(self): return self.version
     @property
-    def iss(self) -> object:
-        return self.issuer
+    def iss(self): return self.issuer
     @property
-    def sub(self) -> object:
-        return self.subject
+    def sub(self): return self.subject
     @property
-    def iat(self) -> object:
-        return self.issued_at
+    def iat(self): return self.issued_at
     @property
-    def exp(self) -> object:
-        return self.expires_at
-
+    def exp(self): return self.expires_at
+    
     @property
-    def sig(self) -> object:
-        return self.signature
+    def sig(self): return self.signature
     @sig.setter
-    def sig(self, value: object) -> None:
-        self.signature = value
+    def sig(self, value): self.signature = value
 
     @classmethod
     def create(
@@ -51,12 +44,12 @@ class Capability:
         issuer_wallet: Wallet,
         subject_did: str,
         scope: Any,
-        exp: int | str,
-        iat: int | str | None = None,
+        exp: Union[int, str],
+        iat: Optional[Union[int, str]] = None,
     ) -> "Capability":
         """
         Create and sign a new capability.
-
+        
         Args:
             issuer_wallet: Wallet that will sign the capability.
             subject_did: DID of the subject receiving the capability.
@@ -86,13 +79,13 @@ class Capability:
 
         return cls(cap_data)
 
-    def verify(self, issuer_public_key: bytes, now: int | float | None = None) -> bool:
+    def verify(self, issuer_public_key: bytes, now: Optional[Union[int, float]] = None) -> bool:
         if not self.signature:
             return False
 
         # Verify expiry
         current_time = now if now is not None else time.time()
-
+        
         try:
             exp_ts = self._to_timestamp(self.expires_at)
             if exp_ts < current_time:
@@ -114,7 +107,7 @@ class Capability:
             for s in self.scope:
                 if s.get("tool") == tool and action in s.get("actions", []):
                     return True
-
+        
         if isinstance(self.scope, str):
             target = f"tool:{tool}"
             if self.scope == target:
@@ -123,17 +116,17 @@ class Capability:
                 return True
             if self.scope.startswith(f"{target}/"):
                 return True
-
+                
         return False
 
     @staticmethod
-    def _to_iso(val: int | str) -> str:
+    def _to_iso(val: Union[int, str]) -> str:
         if isinstance(val, str):
             return val
         return datetime.fromtimestamp(val, tz=timezone.utc).isoformat().replace("+00:00", "Z")
 
     @staticmethod
-    def _to_timestamp(val: int | str | None) -> float:
+    def _to_timestamp(val: Union[int, str, None]) -> float:
         if val is None:
             return 0.0
         if isinstance(val, (int, float)):

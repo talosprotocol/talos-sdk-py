@@ -1,7 +1,6 @@
 import abc
 from datetime import datetime, timezone
-from typing import Any
-
+from typing import Dict, Any
 from pydantic import BaseModel, Field, field_validator
 
 ALGORITHM_AES_256_GCM = "aes-256-gcm"
@@ -11,7 +10,7 @@ SCHEMA_VERSION_V1 = "v1"
 class Envelope(BaseModel):
     """
     Encrypted data envelope (Draft 2020-12 / Normative).
-
+    
     Ensures structural integrity and metadata compliance for secrets-at-rest.
     """
     kek_id: str = Field(..., min_length=1, max_length=255)
@@ -25,30 +24,30 @@ class Envelope(BaseModel):
 
     @field_validator("alg")
     @classmethod
-    def validate_alg(cls, v: str) -> str:
+    def validate_alg(cls, v):
         if v != ALGORITHM_AES_256_GCM:
             raise ValueError(f"Unsupported algorithm: {v}")
         return v
 
     @field_validator("schema_id")
     @classmethod
-    def validate_schema_id(cls, v: str) -> str:
+    def validate_schema_id(cls, v):
         if v != SCHEMA_ID_ENVELOPE:
             raise ValueError(f"Invalid schema_id: {v}")
         return v
 
     @field_validator("schema_version")
     @classmethod
-    def validate_schema_version(cls, v: str) -> str:
+    def validate_schema_version(cls, v):
         if v != SCHEMA_VERSION_V1:
             raise ValueError(f"Invalid schema_version: {v}")
         return v
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> Dict[str, Any]:
         return self.model_dump()
 
     @staticmethod
-    def from_dict(data: dict[str, Any]) -> 'Envelope':
+    def from_dict(data: Dict[str, Any]) -> 'Envelope':
         return Envelope.model_validate(data)
 
     def to_json(self) -> str:
