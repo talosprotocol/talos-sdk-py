@@ -406,9 +406,12 @@ class A2AJsonRpcClient:
                 if not line:
                     continue
                 text = line.decode("utf-8") if isinstance(line, bytes) else str(line)
-                if not text.startswith("data: "):
+                if not text.startswith("data:"):
                     continue
-                payload = json.loads(text[6:])
+                data = text[5:]
+                if not data.strip():
+                    continue
+                payload = json.loads(data)
                 yield self._extract_result(payload)
 
     def _message(

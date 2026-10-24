@@ -72,6 +72,12 @@ graph LR
 pip install talos-sdk-py
 ```
 
+### A2A JSON-RPC streaming
+
+`A2AJsonRpcClient` accepts single-line JSON-RPC SSE events with either
+`data:{...}` or `data: {...}` data fields.
+Empty data fields are ignored so later task updates can still be received.
+
 ### Transport-Only (Phase 10.2)
 
 ```python
