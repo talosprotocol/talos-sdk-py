@@ -68,6 +68,15 @@ graph LR
 
 ### Installation
 
+#### Via Homebrew (CLI Conformance Harness)
+
+```bash
+brew tap talosprotocol/tap
+brew install talos-sdk
+```
+
+#### Via pip (Python Library)
+
 ```bash
 pip install talos-sdk-py
 ```
