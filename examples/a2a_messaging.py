@@ -19,11 +19,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from _common import (
     parse_common_args,
-    safe_print,
     print_header,
-    print_success,
     print_info,
+    print_success,
     print_warning,
+    safe_print,
 )
 
 from talos_sdk.a2a.ratchet_crypto import RatchetFrameCrypto
@@ -53,7 +53,7 @@ def compute_frame_digest(
 
 
 def main():
-    args = parse_common_args(description="Talos A2A Messaging Example")
+    parse_common_args(description="Talos A2A Messaging Example")
 
     print_header("Talos A2A Messaging Example")
 
@@ -68,8 +68,8 @@ def main():
     alice_manager = SessionManager(alice_keypair)
     bob_manager = SessionManager(bob_keypair)
 
-    print(f"   Alice ID: alice-agent")
-    print(f"   Bob ID:   bob-agent")
+    print("   Alice ID: alice-agent")
+    print("   Bob ID:   bob-agent")
 
     # =========================================================================
     # Key Exchange: X3DH

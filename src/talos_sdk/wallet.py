@@ -6,8 +6,7 @@ Identity management as defined in SDK_CONTRACT.md.
 import hashlib
 import os
 import time
-
-from typing import Any, Dict
+from typing import Any
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import (
     Ed25519PrivateKey,
@@ -16,7 +15,6 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 from talos_contracts import base64url_encode
 
 from .canonical import canonical_json_bytes
-
 from .errors import TalosInvalidInputError
 
 # Base58btc alphabet for DID encoding
@@ -168,7 +166,7 @@ class Wallet:
             pk = Ed25519PublicKey.from_public_bytes(public_key)
             pk.verify(signature, message)
             return True
-        except Exception:  # noqa: E722; pylint: disable=broad-except
+        except Exception:  # Invalid public keys and signatures return False.
             return False
 
     def sign_http_request(
@@ -176,9 +174,9 @@ class Wallet:
         method: str,
         path: str,
         query: str = "",
-        body: Dict[str, Any] | None = None,
+        body: dict[str, Any] | None = None,
         opcode: str = "http.request"
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """Sign an HTTP request for Phase 3 Attestation.
 
         Args:
@@ -207,7 +205,7 @@ class Wallet:
             body_bytes = canonical_json_bytes(body)
 
         method_ascii = method.upper().encode('ascii')
-        
+
         # Path+Query: raw string exactly as sent
         # Expect caller to provide raw path and raw query string
         full_path = path + (f"?{query}" if query else "")
@@ -226,7 +224,7 @@ class Wallet:
             ts_ascii + b"\n" +
             opcode_ascii
         )
-        
+
         # 3. Sign
         sig_bytes = self.sign(signing_input)
         sig_b64 = base64url_encode(sig_bytes)

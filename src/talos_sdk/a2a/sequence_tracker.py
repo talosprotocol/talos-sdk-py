@@ -19,7 +19,7 @@ class SequenceStorage(Protocol):
 class InMemorySequenceStorage:
     """Thread-safe in-memory sequence storage."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._data: dict[tuple[str, str], int] = {}
         self._lock = threading.Lock()
 
