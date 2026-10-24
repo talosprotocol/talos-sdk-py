@@ -1,16 +1,17 @@
 """Unit tests for A2A module."""
 
-import pytest
-from unittest.mock import MagicMock
 import threading
+from unittest.mock import MagicMock
+
+import pytest
 
 from talos_sdk.a2a.errors import (
-    A2ATransportError,
+    A2ACryptoNotConfiguredError,
+    A2AFrameDigestMismatchError,
+    A2AFrameReplayError,
     A2ASessionNotFoundError,
     A2ASessionStateInvalidError,
-    A2AFrameReplayError,
-    A2AFrameDigestMismatchError,
-    A2ACryptoNotConfiguredError,
+    A2ATransportError,
     raise_mapped_error,
 )
 from talos_sdk.a2a.models import (
@@ -18,10 +19,9 @@ from talos_sdk.a2a.models import (
     ErrorResponse,
 )
 from talos_sdk.a2a.sequence_tracker import (
-    SequenceTracker,
     InMemorySequenceStorage,
+    SequenceTracker,
 )
-
 
 # === Error Mapping Tests ===
 
@@ -133,7 +133,7 @@ class TestSequenceTracker:
     def test_reserve_increments(self):
         storage = InMemorySequenceStorage()
         tracker = SequenceTracker("sess-1", "alice", storage)
-        
+
         assert tracker.reserve() == 0
         assert tracker.reserve() == 1
         assert tracker.reserve() == 2
@@ -141,12 +141,12 @@ class TestSequenceTracker:
 
     def test_reserve_persists(self):
         storage = InMemorySequenceStorage()
-        
+
         # First tracker reserves some
         tracker1 = SequenceTracker("sess-1", "alice", storage)
         tracker1.reserve()
         tracker1.reserve()
-        
+
         # Second tracker loads from storage
         tracker2 = SequenceTracker("sess-1", "alice", storage)
         assert tracker2.current() == 2
@@ -155,8 +155,8 @@ class TestSequenceTracker:
     def test_default_storage_is_global(self):
         # Two trackers with no storage should share the global default
         tracker1 = SequenceTracker("global-test", "alice")
-        tracker2 = SequenceTracker("global-test", "alice")
-        
+        _tracker2 = SequenceTracker("global-test", "alice")
+
         # They share the same storage, so seq is shared
         tracker1.reserve()
         # tracker2 was constructed before reserve, so it has a cached value
@@ -167,20 +167,20 @@ class TestSequenceTracker:
     def test_thread_safety(self):
         storage = InMemorySequenceStorage()
         tracker = SequenceTracker("thread-test", "alice", storage)
-        
+
         sequences = []
-        
+
         def reserve_many():
             for _ in range(100):
                 seq = tracker.reserve()
                 sequences.append(seq)
-        
+
         threads = [threading.Thread(target=reserve_many) for _ in range(4)]
         for t in threads:
             t.start()
         for t in threads:
             t.join()
-        
+
         # All sequences should be unique
         assert len(sequences) == 400
         assert len(set(sequences)) == 400
@@ -192,7 +192,7 @@ class TestSessionClient:
     @pytest.mark.asyncio
     async def test_crypto_not_configured_send(self):
         from talos_sdk.a2a.session_client import A2ASessionClient
-        
+
         transport = MagicMock()
         client = A2ASessionClient(
             transport=transport,
@@ -202,14 +202,14 @@ class TestSessionClient:
             is_initiator=True,
             crypto=None,
         )
-        
+
         with pytest.raises(A2ACryptoNotConfiguredError):
             await client.send_message(b"hello")
 
     @pytest.mark.asyncio
     async def test_crypto_not_configured_receive(self):
         from talos_sdk.a2a.session_client import A2ASessionClient
-        
+
         transport = MagicMock()
         client = A2ASessionClient(
             transport=transport,
@@ -219,6 +219,6 @@ class TestSessionClient:
             is_initiator=True,
             crypto=None,
         )
-        
+
         with pytest.raises(A2ACryptoNotConfiguredError):
             await client.receive_messages()

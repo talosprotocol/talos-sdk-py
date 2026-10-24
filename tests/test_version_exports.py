@@ -1,18 +1,19 @@
 import base64
 import hashlib
 import json
+import os
 from pathlib import Path
 
 from talos_sdk import CONTRACT_MANIFEST_HASH, SDK_VERSION, SUPPORTED_PROTOCOL_RANGE
 
 
 def _expected_contract_manifest_hash() -> str:
-    manifest_path = (
-        Path(__file__).resolve().parents[3]
-        / "contracts"
-        / "sdk"
-        / "contract_manifest.json"
+    contracts_dir = Path(
+        os.environ.get(
+            "TALOS_CONTRACTS_DIR", Path(__file__).resolve().parents[3] / "contracts"
+        )
     )
+    manifest_path = contracts_dir / "sdk/contract_manifest.json"
     payload = json.loads(manifest_path.read_text())
     canonical = json.dumps(
         payload,

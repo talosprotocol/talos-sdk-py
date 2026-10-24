@@ -251,7 +251,9 @@ class ReferenceA2AHandler(BaseHTTPRequestHandler):
         )
 
     def log_message(self, format: str, *args: Any) -> None:
-        sys.stderr.write("%s - - [%s] %s\n" % (self.address_string(), self.log_date_time_string(), format % args))
+        sys.stderr.write(
+            f"{self.address_string()} - - [{self.log_date_time_string()}] {format % args}\n"
+        )
 
     def _agent_card(self) -> dict[str, Any]:
         return {

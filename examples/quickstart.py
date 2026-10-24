@@ -19,12 +19,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from _common import (
-    parse_common_args,
     check_gateway,
-    safe_print,
+    parse_common_args,
     print_header,
-    print_success,
     print_info,
+    print_success,
+    safe_print,
 )
 
 from talos_sdk import TalosClient, Wallet

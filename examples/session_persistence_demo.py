@@ -27,19 +27,19 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from _common import (
     parse_common_args,
-    safe_print,
     print_header,
-    print_success,
     print_info,
+    print_success,
     print_warning,
+    safe_print,
 )
 
 from talos_sdk.crypto import generate_signing_keypair
-from talos_sdk.session import SessionManager, Session
+from talos_sdk.session import Session, SessionManager
 
 
 def main():
-    args = parse_common_args(description="Talos Session Persistence Demo")
+    parse_common_args(description="Talos Session Persistence Demo")
 
     print_header("Talos Session Persistence Demo")
     print_warning("State files stored in temp directory for demo only.")

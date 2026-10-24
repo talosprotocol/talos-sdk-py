@@ -1,7 +1,10 @@
-import os
 import binascii
+import os
+
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from .kek import KekProvider, Envelope, ALGORITHM_AES_256_GCM
+
+from .kek import ALGORITHM_AES_256_GCM, Envelope, KekProvider
+
 
 class LocalKekProvider(KekProvider):
     """
@@ -18,12 +21,12 @@ class LocalKekProvider(KekProvider):
     def encrypt(self, plaintext: bytes) -> Envelope:
         iv = os.urandom(12)
         ciphertext_and_tag = self.aesgcm.encrypt(iv, plaintext, None)
-        
+
         # Split (tag is last 16 bytes for AESGCM in cryptography lib?)
         # Wait, AESGCM.encrypt returns ciphertext + tag appended.
         ciphertext = ciphertext_and_tag[:-16]
         tag = ciphertext_and_tag[-16:]
-        
+
         return Envelope(
             kek_id=self.key_id,
             iv=binascii.hexlify(iv).decode('ascii'),
@@ -35,15 +38,15 @@ class LocalKekProvider(KekProvider):
     def decrypt(self, envelope: Envelope) -> bytes:
         if envelope.kek_id != self.key_id:
             raise ValueError(f"Key mismatch: Envelope uses {envelope.kek_id}, Provider has {self.key_id}")
-        
+
         if envelope.alg != ALGORITHM_AES_256_GCM:
             raise ValueError(f"Unsupported algorithm: {envelope.alg}")
-            
+
         iv = binascii.unhexlify(envelope.iv)
         tag = binascii.unhexlify(envelope.tag)
         ciphertext = binascii.unhexlify(envelope.ciphertext)
-        
+
         # cryptography expects ciphertext + tag for decrypt
         data = ciphertext + tag
-        
+
         return self.aesgcm.decrypt(iv, data, None)

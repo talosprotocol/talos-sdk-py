@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 _HEX64 = re.compile(r"^[a-f0-9]{64}$")
 _B64U_NOPAD = re.compile(r"^[A-Za-z0-9_-]+$")  # no '=' allowed, non-empty
@@ -17,7 +17,7 @@ class ContractModel(BaseModel):
 
     @field_validator("*", mode="before")
     @classmethod
-    def validate_hashes_and_digests(cls, v, info):
+    def validate_hashes_and_digests(cls, v: object, info: ValidationInfo) -> object:
         """Validate digest and hash fields are lowercase hex sha256."""
         name = (info.field_name or "").lower()
         if isinstance(v, str) and ("digest" in name or "hash" in name):
@@ -42,7 +42,7 @@ class EncryptedFrame(ContractModel):
 
     @field_validator("header_b64u", "ciphertext_b64u", mode="before")
     @classmethod
-    def validate_b64url_no_pad(cls, v):
+    def validate_b64url_no_pad(cls, v: object) -> str:
         """Validate base64url encoding without padding."""
         if not isinstance(v, str) or not _B64U_NOPAD.fullmatch(v):
             raise ValueError("Must be non-empty base64url without padding")
